@@ -81,6 +81,8 @@ function event_espresso_my_events(){
 					//Build the payment link
 					$payment_url = home_url() . "/?page_id=" . $org_options['return_url'] . "&amp;registration_id=" . $registration_id;
 					//$payment_link = '<a href="' . $payment_url . '" title="'.__('View Your Payment Details').'">' . event_espresso_paid_status_icon( $payment_status ) . '</a>';
+					
+					//Deprecated ticketing system support
 					//If the custom ticket is available, load the template file
 					if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . "/ticketing/template.php")){
 						if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . "/ticketing/functions.php")){
@@ -90,6 +92,11 @@ function event_espresso_my_events(){
 								//Build the ticket link
 						$ticket_url = home_url() . "/?download_ticket=true&amp;id=" . $attendee_id . "&amp;registration_id=".$registration_id;
 						$ticket_link = '<strong><a href="' . $ticket_url . '">' . __('Download Ticket Now!') . '</a></strong>';
+					}
+					
+					//New ticketing system suport
+					if (function_exists('espresso_ticket_launch')){
+						$ticket_link = '<strong>'. espresso_ticket_links($registration_id, $attendee_id) . '</strong>';
 					}
 
 ?>
