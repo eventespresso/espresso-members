@@ -186,7 +186,7 @@ function event_espresso_event() {
 }
 
 function event_espresso_has_event( $args = '') {
-	global $event_template;
+	global $event_template, $bp;
 	
 	$defaults = array(
 		'type' => $type,
@@ -201,7 +201,7 @@ function event_espresso_has_event( $args = '') {
 	}
 	
 	$event_template = new Event_Espresso_Event($event_id, false);
-		
+//		var_dump($event_template);
 	return apply_filters( 'bp_has_event', $event_template->available_for_display(), &$event_template );
 	
 }
@@ -312,7 +312,7 @@ function event_espresso_event_attendees() {
 	echo apply_filters( 'event_espresso_event_attendees', event_espresso_get_event_attendees() );
 }
 	function event_espresso_get_event_attendees() {
-		global $event_template;
+		global $event_template, $bp;
 
 		if ($event_template->total_attendee_count > 0) {
 		

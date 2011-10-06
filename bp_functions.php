@@ -22,18 +22,18 @@ if ( !defined( 'EE_EVENT_AVATAR_ATTENDEE_WIDTH' ) )
 /*
  * register with hook 'wp_print_styles'
  */
-add_action('wp_print_styles', 'add_event_espresso_stylesheet');
+add_action('wp_print_styles', 'add_event_espresso_bp_stylesheet');
 
 /*
  * Enqueue style-file, if it exists.
  */
 
 function add_event_espresso_bp_stylesheet() {
-    $myStyleUrl = WP_PLUGIN_URL . '/espresso-members/styles/style.css';
-    $myStyleFile = WP_PLUGIN_DIR . '/espresso-members/styles/style.css';
-    if ( file_exists($myStyleFile) ) {
-        wp_register_style('myStyleSheets', $myStyleUrl);
-        wp_enqueue_style( 'myStyleSheets');
+    $ee_bp_style_url = WP_PLUGIN_URL . '/espresso-members/styles/style.css';
+    $ee_bp_style_file = WP_PLUGIN_DIR . '/espresso-members/styles/style.css';
+    if ( file_exists($ee_bp_style_file) ) {
+        wp_register_style('ee_bp_styles', $ee_bp_style_url);
+        wp_enqueue_style( 'ee_bp_styles');
     }
 }
 	
@@ -46,20 +46,22 @@ function event_espresso_bp_setup_globals() {
 	global $bp, $wpdb;
 
 	/* For internal identification */
-	$bp->event_espresso_bp->id = 'example';
+	$bp->events->id = 'ee-events';
 
-	$bp->event_espresso_bp->table_name = $wpdb->base_prefix . 'event_espresso_bp';
-	$bp->event_espresso_bp->format_notification_function = 'event_espresso_bp_format_notifications';
-	$bp->event_espresso_bp->slug = EE_BP_SLUG;
-
+	$bp->events->table_name = $wpdb->base_prefix . 'event_espresso_bp';
+	$bp->events->format_notification_function = 'event_espresso_bp_format_notifications';
+	$bp->events->slug = EE_BP_SLUG;
+	
 	/* Register this in the active components array */
-	$bp->active_components[$bp->event_espresso_bp->slug] = $bp->event_espresso_bp->id;
+	$bp->active_components[$bp->events->slug] = $bp->events->id;
 }
+
 /***
  * In versions of BuddyPress 1.2.2 and newer you will be able to use:
  * add_action( 'bp_setup_globals', 'event_espresso_bp_setup_globals' );
  */
-add_action( 'wp', 'event_espresso_bp_setup_globals', 2 );
+add_action( 'bp_setup_globals', 'event_espresso_bp_setup_globals' );
+//add_action( 'wp', 'event_espresso_bp_setup_globals', 2 );
 add_action( 'admin_menu', 'event_espresso_bp_setup_globals', 2 );
 
 /**
@@ -72,41 +74,29 @@ function event_espresso_bp_setup_root_component() {
 }
 add_action( 'bp_setup_root_components', 'event_espresso_bp_setup_root_component' );
 
-/**
- * Adds list item to the site's main navigation
- *
- * @global object $bp BuddyPress global settings
- * @since 0.1
- */
-function bpca_add_to_site_nav() {
-	global $bp;
-?>
-	<li<?php if ( bp_is_page( $bp->event_espresso_bp->slug ) ) : ?> class="selected"<?php endif; ?>>
-		<a href="<?php echo site_url() ?>/<?php echo $bp->event_espresso_bp->slug ?>/"><?php _e( 'Events', 'event-espresso' ) ?></a>
-	</li>
-<?php
-}
-add_action( 'bp_nav_items', 'bpca_add_to_site_nav' );
 
 function event_espresso_event_directory() {
     global $bp, $is_member_page;
 // 	echo "<BR><BR><BR><BR><BR><BR>----".$bp->is_single_item."<BR>";
 // 	print_r ($bp); exit;
-	if ( $bp->current_component == $bp->event_espresso_bp->slug && !$bp->current_action && !$bp->current_item  ) {
+//  var_dump(bp_is_current_component('events'));
+	if ( bp_is_current_component('events') ) {
+	   if(!bp_current_action() && !$bp->current_item) {
                 $bp->is_directory = true;
 
                 do_action( 'event_espresso_setup_event_directory' );
                 bp_core_load_template( apply_filters( 'event_espresso_template_directory', 'events/index' ) );
                 return;
-        } else if ($bp->current_action) {
+        } else if (bp_current_action()) {
                 $bp->is_directory = false;        
                 $bp->current_item = $bp->current_action;
                 do_action( 'event_espresso_setup_event_detail_page' );        
-                bp_core_load_template( apply_filters( 'event_espresso_template_detail_page', 'events/event' ) );
+                bp_core_load_template( apply_filters( 'event_espresso_template_detail_page', 'members/single/events' ) );
                 return;
         }
-}
-add_action( 'wp', 'event_espresso_event_directory', 2 );
+					}
+ }
+add_action( 'bp_screens', 'event_espresso_event_directory', 2 );
 
 /**
  * event_espresso_bp_setup_nav()
@@ -118,54 +108,54 @@ add_action( 'wp', 'event_espresso_event_directory', 2 );
 function event_espresso_bp_setup_nav() {
 	global $bp;
 
-	/* Add 'Example' to the main user profile navigation */
+	// Add 'Example' to the main user profile navigation 
 	bp_core_new_nav_item( array(
 		'name' => __( 'Events', 'bp-event-espresso' ),
-		'slug' => $bp->event_espresso_bp->slug,
+		'slug' => $bp->events->slug,
 		'position' => 80,
 		'screen_function' => 'event_espresso_bp_screen_one',
 		'default_subnav_slug' => 'screen-one'
 	) );
 
-	$example_link = $bp->loggedin_user->domain . $bp->event_espresso_bp->slug . '/';
+	$example_link = $bp->loggedin_user->domain . $bp->events->slug . '/';
 
-	/* Create two sub nav items for this component */
+	// Create two sub nav items for this component 
 	bp_core_new_subnav_item( array(
-		'name' => __( 'Screen One', 'bp-event-espresso' ),
-		'slug' => 'screen-one',
-		'parent_slug' => $bp->event_espresso_bp->slug,
+		'name' => __( 'My Events', 'bp-event-espresso' ),
+		'slug' => 'my-events',
+		'parent_slug' => $bp->events->slug,
 		'parent_url' => $example_link,
 		'screen_function' => 'event_espresso_bp_screen_one',
 		'position' => 10
 	) );
 
-	bp_core_new_subnav_item( array(
+/*	bp_core_new_subnav_item( array(
 		'name' => __( 'Screen Two', 'bp-event-espresso' ),
 		'slug' => 'screen-two',
-		'parent_slug' => $bp->event_espresso_bp->slug,
+		'parent_slug' => $bp->events->slug,
 		'parent_url' => $example_link,
 		'screen_function' => 'event_espresso_bp_screen_two',
 		'position' => 20,
 		'user_has_access' => bp_is_my_profile() // Only the logged in user can access this on his/her profile
-	) );
+	) );*/
 
-	/* Add a nav item for this component under the settings nav item. See event_espresso_bp_screen_settings_menu() for more info */
+	// Add a nav item for this component under the settings nav item. See event_espresso_bp_screen_settings_menu() for more info 
 	bp_core_new_subnav_item( array(
-		'name' => __( 'My Events', 'bp-event-espresso' ),
+		'name' => __( 'My Events Management', 'bp-event-espresso' ),
 		'slug' => 'my-events-management',
 		'parent_slug' => $bp->settings->slug,
 		'parent_url' => $bp->loggedin_user->domain . $bp->settings->slug . '/',
 		'screen_function' => 'event_espresso_bp_screen_settings_menu',
 		'position' => 40,
 		'user_has_access' => bp_is_my_profile() // Only the logged in user can access this on his/her profile
-	) );
+	) ); 
 }
 
 /***
  * In versions of BuddyPress 1.2.2 and newer you will be able to use:
  * add_action( 'bp_setup_nav', 'event_espresso_bp_setup_nav' );
  */
-add_action( 'wp', 'event_espresso_bp_setup_nav', 2 );
+add_action( 'bp_setup_nav', 'event_espresso_bp_setup_nav', 2 );
 add_action( 'admin_menu', 'event_espresso_bp_setup_nav', 2 );
 
 /**
@@ -188,7 +178,7 @@ function event_espresso_bp_load_template_filter( $found_template, $templates ) {
 	/**
 	 * Only filter the template location when we're on the example component pages.
 	 */
-	if ( $bp->current_component != $bp->event_espresso_bp->slug )
+	if ( $bp->current_component != $bp->events->slug )
 		return $found_template;
 
 	foreach ( (array) $templates as $template ) {
@@ -199,7 +189,7 @@ function event_espresso_bp_load_template_filter( $found_template, $templates ) {
 	}
 
 	$found_template = $filtered_templates[0];
-
+//var_dump($found_template);
 	return apply_filters( 'event_espresso_bp_load_template_filter', $found_template );
 }
 add_filter( 'bp_located_template', 'event_espresso_bp_load_template_filter', 10, 2 );
@@ -254,7 +244,7 @@ function event_espresso_bp_screen_one() {
 	 * We need to run a check to see if the current user has clicked on the 'send high five' link.
 	 * If they have, then let's send the five, and redirect back with a nice error/success message.
 	 */
-	if ( $bp->current_component == $bp->event_espresso_bp->slug && 'screen-one' == $bp->current_action && 'send-h5' == $bp->action_variables[0] ) {
+	if ( $bp->current_component == $bp->events->slug && 'screen-one' == $bp->current_action && 'send-h5' == $bp->action_variables[0] ) {
 		/* The logged in user has clicked on the 'send high five' link */
 		if ( bp_is_my_profile() ) {
 			/* Don't let users high five themselves */
@@ -266,7 +256,7 @@ function event_espresso_bp_screen_one() {
 				bp_core_add_message( __( 'High-five could not be sent.', 'bp-event-espresso' ), 'error' );
 		}
 
-		bp_core_redirect( $bp->displayed_user->domain . $bp->event_espresso_bp->slug . '/screen-one' );
+		bp_core_redirect( $bp->displayed_user->domain . $bp->events->slug . '/screen-one' );
 	}
 
 	/* Add a do action here, so your component can be extended by others. */
@@ -364,7 +354,7 @@ function event_espresso_bp_screen_two() {
 	 * and a "Reject" link (directs to http://example.org/members/andy/example/screen-two/reject)
 	 */
 
-	if ( $bp->current_component == $bp->event_espresso_bp->slug && 'screen-two' == $bp->current_action && 'accept' == $bp->action_variables[0] ) {
+	if ( $bp->current_component == $bp->events->slug && 'screen-two' == $bp->current_action && 'accept' == $bp->action_variables[0] ) {
 		if ( event_espresso_bp_accept_terms() ) {
 			/* Add a success message, that will be displayed in the template on the next page load */
 			bp_core_add_message( __( 'Terms were accepted!', 'bp-event-espresso' ) );
@@ -380,7 +370,7 @@ function event_espresso_bp_screen_two() {
 		bp_core_redirect( $bp->loggedin_user->domain . $bp->current_component );
 	}
 
-	if ( $bp->current_component == $bp->event_espresso_bp->slug && 'screen-two' == $bp->current_action && 'reject' == $bp->action_variables[0] ) {
+	if ( $bp->current_component == $bp->events->slug && 'screen-two' == $bp->current_action && 'reject' == $bp->action_variables[0] ) {
 		if ( event_espresso_bp_reject_terms() ) {
 			/* Add a success message, that will be displayed in the template on the next page load */
 			bp_core_add_message( __( 'Terms were rejected!', 'bp-event-espresso' ) );
@@ -419,8 +409,8 @@ function event_espresso_bp_screen_two() {
 		<h4><?php _e( 'Welcome to Screen Two', 'bp-event-espresso' ) ?></h4>
 
 		<?php
-			$accept_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->event_espresso_bp->slug . '/screen-two/accept', 'event_espresso_bp_accept_terms' ) . '">' . __( 'Accept', 'bp-event-espresso' ) . '</a>';
-			$reject_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->event_espresso_bp->slug . '/screen-two/reject', 'event_espresso_bp_reject_terms' ) . '">' . __( 'Reject', 'bp-event-espresso' ) . '</a>';
+			$accept_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/accept', 'event_espresso_bp_accept_terms' ) . '">' . __( 'Accept', 'bp-event-espresso' ) . '</a>';
+			$reject_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/reject', 'event_espresso_bp_reject_terms' ) . '">' . __( 'Reject', 'bp-event-espresso' ) . '</a>';
 		?>
 
 		<p><?php printf( __( 'You must %s or %s the terms of use policy.', 'bp-event-espresso' ), $accept_link, $reject_link ) ?></p>
