@@ -110,7 +110,7 @@ function event_espresso_bp_setup_nav() {
 
 	// Add 'Example' to the main user profile navigation 
 	bp_core_new_nav_item( array(
-		'name' => __( 'Events', 'bp-event-espresso' ),
+		'name' => __( 'Events', 'event_espresso' ),
 		'slug' => $bp->events->slug,
 		'position' => 80,
 		'screen_function' => 'event_espresso_bp_screen_one',
@@ -121,7 +121,7 @@ function event_espresso_bp_setup_nav() {
 
 	// Create two sub nav items for this component 
 	bp_core_new_subnav_item( array(
-		'name' => __( 'My Events', 'bp-event-espresso' ),
+		'name' => __( 'My Events', 'event_espresso' ),
 		'slug' => 'my-events',
 		'parent_slug' => $bp->events->slug,
 		'parent_url' => $example_link,
@@ -130,7 +130,7 @@ function event_espresso_bp_setup_nav() {
 	) );
 
 /*	bp_core_new_subnav_item( array(
-		'name' => __( 'Screen Two', 'bp-event-espresso' ),
+		'name' => __( 'Screen Two', 'event_espresso' ),
 		'slug' => 'screen-two',
 		'parent_slug' => $bp->events->slug,
 		'parent_url' => $example_link,
@@ -141,7 +141,7 @@ function event_espresso_bp_setup_nav() {
 
 	// Add a nav item for this component under the settings nav item. See event_espresso_bp_screen_settings_menu() for more info 
 	bp_core_new_subnav_item( array(
-		'name' => __( 'My Events Management', 'bp-event-espresso' ),
+		'name' => __( 'My Events Management', 'event_espresso' ),
 		'slug' => 'my-events-management',
 		'parent_slug' => $bp->settings->slug,
 		'parent_url' => $bp->loggedin_user->domain . $bp->settings->slug . '/',
@@ -248,12 +248,12 @@ function event_espresso_bp_screen_one() {
 		/* The logged in user has clicked on the 'send high five' link */
 		if ( bp_is_my_profile() ) {
 			/* Don't let users high five themselves */
-			bp_core_add_message( __( 'No self-fives! :)', 'bp-event-espresso' ), 'error' );
+			bp_core_add_message( __( 'No self-fives! :)', 'event_espresso' ), 'error' );
 		} else {
 			if ( event_espresso_bp_send_highfive( $bp->displayed_user->id, $bp->loggedin_user->id ) )
-				bp_core_add_message( __( 'High-five sent!', 'bp-event-espresso' ) );
+				bp_core_add_message( __( 'High-five sent!', 'event_espresso' ) );
 			else
-				bp_core_add_message( __( 'High-five could not be sent.', 'bp-event-espresso' ), 'error' );
+				bp_core_add_message( __( 'High-five could not be sent.', 'event_espresso' ), 'error' );
 		}
 
 		bp_core_redirect( $bp->displayed_user->domain . $bp->events->slug . '/screen-one' );
@@ -307,7 +307,7 @@ function event_espresso_bp_screen_one() {
 	 * display the corresponding information. The functions are presented below:
 	 */
 	function event_espresso_bp_screen_one_title() {
-		_e( 'Screen One', 'bp-event-espresso' );
+		_e( 'Screen One', 'event_espresso' );
 	}
 
 	function event_espresso_bp_screen_one_content() {
@@ -323,10 +323,10 @@ function event_espresso_bp_screen_one() {
 		$send_link = wp_nonce_url( $bp->displayed_user->domain . $bp->current_component . '/screen-one/send-h5', 'event_espresso_bp_send_high_five' );
 	?>
 		<h4><?php _e( 'Welcome to Screen One', 'bp-event-espresso' ) ?></h4>
-		<p><?php printf( __( 'Send %s a <a href="%s" title="Send high-five!">high-five!</a>', 'bp-event-espresso' ), $bp->displayed_user->fullname, $send_link ) ?></p>
+		<p><?php printf( __( 'Send %s a <a href="%s" title="Send high-five!">high-five!</a>', 'event_espresso' ), $bp->displayed_user->fullname, $send_link ) ?></p>
 
 		<?php if ( $high_fives ) : ?>
-			<h4><?php _e( 'Received High Fives!', 'bp-event-espresso' ) ?></h4>
+			<h4><?php _e( 'Received High Fives!', 'event_espresso' ) ?></h4>
 
 			<table id="high-fives">
 				<?php foreach ( $high_fives as $user_id ) : ?>
@@ -357,10 +357,10 @@ function event_espresso_bp_screen_two() {
 	if ( $bp->current_component == $bp->events->slug && 'screen-two' == $bp->current_action && 'accept' == $bp->action_variables[0] ) {
 		if ( event_espresso_bp_accept_terms() ) {
 			/* Add a success message, that will be displayed in the template on the next page load */
-			bp_core_add_message( __( 'Terms were accepted!', 'bp-event-espresso' ) );
+			bp_core_add_message( __( 'Terms were accepted!', 'event_espresso' ) );
 		} else {
 			/* Add a failure message if there was a problem */
-			bp_core_add_message( __( 'Terms could not be accepted.', 'bp-event-espresso' ), 'error' );
+			bp_core_add_message( __( 'Terms could not be accepted.', 'event_espresso' ), 'error' );
 		}
 
 		/**
@@ -373,10 +373,10 @@ function event_espresso_bp_screen_two() {
 	if ( $bp->current_component == $bp->events->slug && 'screen-two' == $bp->current_action && 'reject' == $bp->action_variables[0] ) {
 		if ( event_espresso_bp_reject_terms() ) {
 			/* Add a success message, that will be displayed in the template on the next page load */
-			bp_core_add_message( __( 'Terms were rejected!', 'bp-event-espresso' ) );
+			bp_core_add_message( __( 'Terms were rejected!', 'event_espresso' ) );
 		} else {
 			/* Add a failure message if there was a problem */
-			bp_core_add_message( __( 'Terms could not be rejected.', 'bp-event-espresso' ), 'error' );
+			bp_core_add_message( __( 'Terms could not be rejected.', 'event_espresso' ), 'error' );
 		}
 
 		/**
@@ -400,17 +400,17 @@ function event_espresso_bp_screen_two() {
 }
 
 	function event_espresso_bp_screen_two_title() {
-		_e( 'Screen Two', 'bp-event-espresso' );
+		_e( 'Screen Two', 'event_espresso' );
 	}
 
 	function event_espresso_bp_screen_two_content() {
 		global $bp; ?>
 
-		<h4><?php _e( 'Welcome to Screen Two', 'bp-event-espresso' ) ?></h4>
+		<h4><?php _e( 'Welcome to Screen Two', 'event_espresso' ) ?></h4>
 
 		<?php
-			$accept_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/accept', 'event_espresso_bp_accept_terms' ) . '">' . __( 'Accept', 'bp-event-espresso' ) . '</a>';
-			$reject_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/reject', 'event_espresso_bp_reject_terms' ) . '">' . __( 'Reject', 'bp-event-espresso' ) . '</a>';
+			$accept_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/accept', 'event_espresso_bp_accept_terms' ) . '">' . __( 'Accept', 'event_espresso' ) . '</a>';
+			$reject_link = '<a href="' . wp_nonce_url( $bp->loggedin_user->domain . $bp->events->slug . '/screen-two/reject', 'event_espresso_bp_reject_terms' ) . '">' . __( 'Reject', 'event_espresso' ) . '</a>';
 		?>
 
 		<p><?php printf( __( 'You must %s or %s the terms of use policy.', 'bp-event-espresso' ), $accept_link, $reject_link ) ?></p>
@@ -724,8 +724,8 @@ function event_espresso_get_add_register_button( $event_id = 0 ) {
 		'wrapper_id'        => 'register-button-' . $event_id,
 		'link_class'        => 'requested',
 		'link_href'         => $registration_url,
-		'link_text'         => __( 'Register For Event', 'buddypress' ),
-		'link_title'        => __( 'Register For Event', 'buddypress' )
+		'link_text'         => __( 'Register For Event', 'event_espresso' ),
+		'link_title'        => __( 'Register For Event', 'event_espresso' )
 	);
 
 	// Filter and return the HTML button

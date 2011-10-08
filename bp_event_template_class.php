@@ -181,13 +181,13 @@ function bp_events_pagination_count() {
 	$total = bp_core_number_format( $events_template->total_event_count );
 
 	if ( 'active' == $events_template->type )
-		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s active events)', 'buddypress' ), $from_num, $to_num, $total );
+		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s active events)', 'event_espresso' ), $from_num, $to_num, $total );
 	else if ( 'popular' == $events_template->type )
-		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events with friends)', 'buddypress' ), $from_num, $to_num, $total );
+		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events with friends)', 'event_espresso' ), $from_num, $to_num, $total );
 	else if ( 'online' == $events_template->type )
-		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events online)', 'buddypress' ), $from_num, $to_num, $total );
+		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events online)', 'event_espresso' ), $from_num, $to_num, $total );
 	else
-		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events)', 'buddypress' ), $from_num, $to_num, $total );
+		echo sprintf( __( 'Viewing event %1$s to %2$s (of %3$s events)', 'event_espresso' ), $from_num, $to_num, $total );
 
 	?><span class="ajax-loader"></span><?php
 }
