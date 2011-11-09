@@ -347,79 +347,125 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 
 //Creates dropdowns if multiple prices are associated with an event
 if (!function_exists('event_espresso_price_dropdown')) {
-    function event_espresso_price_dropdown($event_id) {
-        global $espresso_premium;
-		$html = '';
-		$message = '';
-        if ($espresso_premium != true)
+    
+	function event_espresso_price_dropdown($event_id, $show_label = 1, $multi_reg = 0, $current_value = '', $label = '') {
+        
+		//Attention:
+		//This is a copy of a core function. Any changes made here should be added to the core function of the same name
+		
+		global  $wpdb, $org_options, $espresso_premium;
+		
+		if ($espresso_premium != true)
             return;
-        global $wpdb, $org_options;
+		
+		//Default values	
+		$html = '';
+		$early_bird_message = '';
+		$surcharge = '';
+		$label = $label == '' ? __('Choose an Option: ', 'event_espresso') : $label;
+		
+		//Will make the name an array and put the time id as a key so we know which event this belongs to
+        $multi_name_adjust = $multi_reg == 1 ? "[$event_id]" : '';
+        
+		//Gets the surcharge text
+		$surcharge_text = isset($org_options['surcharge_text']) ? $org_options['surcharge_text'] : __('Surcharge', 'event_espresso');
+        
+		//Initial price query
+		//If the user is looged in, create a special query to get the member price
         if (is_user_logged_in()) {
             $sql = "SELECT id, event_cost, surcharge, surcharge_type, member_price, member_price_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
         } else {
            $sql = "SELECT id, event_cost, surcharge, surcharge_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC"; 
         }
-		//echo '<p>'.$sql.'</p>';
 		$prices = $wpdb->get_results($sql);
-        if ($wpdb->num_rows > 1) {
-             $html .= '<label for="event_cost">' . __('Choose an Option: ', 'event_espresso') . '</label>';
-             $html .= '<select name="price_option" id="price_option-' . $event_id . '">';
 
-            foreach ($prices as $price) {
-                $member_price = ($price->member_price == "") ? $price->event_cost : $price->member_price;
-                $member_price_type = ($price->member_price_type == "") ? $price->price_type : $price->member_price_type;
-                // Addition for Early Registration discount
-                if (early_discount_amount($event_id, $member_price) != false) {
-                    $early_price_data = array();
-                    $early_price_data = early_discount_amount($event_id, $member_price);
-                    $member_price = $early_price_data['event_price'];
-                    $message = __(' Early Pricing', 'event_espresso');
-                }
-                $surcharge = '';
-                if ($price->surcharge > 0 && $member_price > 0.00) {
-                    $surcharge = " + {$org_options['currency_symbol']}{$price->surcharge} " . __('Surcharge', 'event_espresso');
-                    if ($price->surcharge_type == 'pct') {
-                        $surcharge = " + {$price->surcharge}% " . __('Surcharge', 'event_espresso');
-                    }
-                }
-                //Using price ID
-                $html .= '<option value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $message . ') ' . $surcharge . ' </option>';
+		//If more than one price was added to an event, we need to create a drop down to select the price.
+		if ($wpdb->num_rows > 1) {
+			
+			//Create the label for the drop down
+			$html .= $show_label == 1 ? '<label for="event_cost">' . $label . '</label>' : '';
+			
+			//Create a dropdown of prices
+			$html .= '<select name="price_option" id="price_option-' . $event_id . '">';
+
+			foreach ($prices as $price) {
+				
+				//Create the member price		
+				$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
+				$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
+				
+				//Check for Early Registration discount
+				if (early_discount_amount($event_id, $member_price) != false) {
+					$early_price_data = array();
+					$early_price_data = early_discount_amount($event_id, $member_price);
+					$member_price = $early_price_data['event_price'];
+					$early_bird_message = __(' Early Pricing', 'event_espresso');
+				}
+				
+				//Calculate the surcharge
+				if ($price->surcharge > 0 && $member_price > 0.00) {
+					$surcharge = " + {$org_options['currency_symbol']}{$price->surcharge} " . $surcharge_text;
+					if ($price->surcharge_type == 'pct') {
+						$surcharge = " + {$price->surcharge}% " . $surcharge_text;
+					}
+				}
+				
+				//Using price ID
+				//If the price id was passed to this function, we need need to select that price.
+				$selected = $current_value == $price->id ? 'selected="selected" ' : '';
+				
+				//Create the drop down options
+				$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . ') ' . $surcharge . ' </option>';
+				
             }
+			
+			//Create a hidden field so that we know the price dropdown was used
             $html .= '</select><input type="hidden" name="price_select" id="price_select-' . $event_id . '" value="true">';
-        }else if ($wpdb->num_rows == 1) {
+		
+		//If a single price was added to an event, then create the price display and hidden fields to hold the additional information.	
+		} else if ($wpdb->num_rows == 1) {
             foreach ($prices as $price) {
+				
+				//Convert to the member price if the user is logged in
                 if (is_user_logged_in()) {
                     $member_price = $price->member_price;
                 } else {
                     $member_price = $price->event_cost;
                 }
-                // Addition for Early Registration discount
-                if (early_discount_amount($event_id, $member_price) != false) {
-                    $early_price_data = array();
-                    $early_price_data = early_discount_amount($event_id, $member_price);
-                    $member_price = $early_price_data['event_price'];
-                    $message = __(' (including ' . $early_price_data['early_disc'] . ' early discount)', 'event_espresso');
-                } else $message = '';
+				
+                //Check for Early Registration discount
+				if (early_discount_amount($event_id, $member_price) != false) {
+					$early_price_data = array();
+					$early_price_data = early_discount_amount($event_id, $member_price);
+					$member_price = $early_price_data['event_price'];
+					$early_bird_message = sprintf(__(' (including %s early discount) ', 'event_espresso'), $early_price_data['early_disc']);
+				}
 
-                //$surcharge = ($price->surcharge > 0.00 && $member_price > 0.00)?" +{$price->surcharge}% " . __('Surcharge','event_espresso'):'';
-                $surcharge = '';
+				//Calculate the surcharge
+				if ($price->surcharge > 0 && $member_price > 0.00) {
+					$surcharge = " + {$org_options['currency_symbol']}{$price->surcharge} " . $surcharge_text;
+					if ($price->surcharge_type == 'pct') {
+						$surcharge = " + {$price->surcharge}% " . $surcharge_text;
+					}
+				}
 
-                if ($price->surcharge > 0 && $member_price > 0.00) {
-                    $surcharge = " + {$org_options['currency_symbol']}{$price->surcharge} " . __('Surcharge', 'event_espresso');
-                    if ($price->surcharge_type == 'pct') {
-                        $surcharge = " + {$price->surcharge}% " . __('Surcharge', 'event_espresso');
-                    }
-                }
-
-                $html .= '<span class="event_price_label">' . __('Price: ', 'event_espresso') . '</span> <span class="event_price_value">' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $message . $surcharge . '</span>';
-                $html .= '<input type="hidden" name="price_id" id="price_id-' . $event_id . '" value="' . $price->id . '">';
-            }
-        }elseif ($wpdb->num_rows < 0 || $member_price == 0.00){
-            $html .= '<span class="free_event">' . __('Price Missing', 'event_espresso') . '</span>';
-            $html .= '<input type="hidden" name="payment" id="payment-' . $event_id . '" value="0.00">';
-        }
+				//Create the single price display
+				$html .= '<span class="event_price_label">' . __('Price: ', 'event_espresso') . '</span> <span class="event_price_value">' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . $surcharge . '</span>';
+				
+				//Create hidden fields to pass additional information to the add_attendees_to_db function
+				$html .= '<input type="hidden" name="price_id" id="price_id-' . $event_id . '" value="' . $price->id . '">';
+				$html .= '<input type="hidden" name="event_cost' . $multi_name_adjust . '" id="event_cost-' . $price->id . '" value="' . number_format($price->event_cost, 2, '.', '') . '">';
+			}
+		
+		//If no prices are found, display the free event message
+		} else if ($wpdb->num_rows == 0) {
+			$html .= '<span class="free_event">' . __('Free Event', 'event_espresso') . '</span>';
+			$html .= '<input type="hidden" name="payment' . $multi_name_adjust . '" id="payment-' . $event_id . '" value="' . __('free event', 'event_espresso') . '">';
+		}
+		
 		return  $html;
     }
+	
 }
 
 /*
