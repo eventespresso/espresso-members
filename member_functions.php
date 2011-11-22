@@ -378,7 +378,7 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
            $sql = "SELECT id, event_cost, surcharge, surcharge_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
         }
 		$prices = $wpdb->get_results($sql);
-var_dump($prices);
+
 		//If more than one price was added to an event, we need to create a drop down to select the price.
 		if ($wpdb->num_rows > 1) {
 
