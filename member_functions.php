@@ -311,7 +311,7 @@ if (!function_exists('event_espresso_member_pricing_update')) {
 
 if (!function_exists('event_espresso_member_pricing_new')) {
     function event_espresso_member_pricing_new() {
-        global $espresso_premium;
+        global $espresso_premium, $org_options;
         if ($espresso_premium != true)
             return;
         $member_price_counter = 1;
