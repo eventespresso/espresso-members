@@ -391,8 +391,13 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 			foreach ($prices as $price) {
 
 				//Create the member price
-				$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
-				$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
+				if (is_user_logged_in()) {
+					$member_price = $price->member_price;
+					$member_price_type = $price->member_price_type;
+				} else {
+					$member_price = $price->event_cost;
+					$member_price_type = $price->price_type;
+				}
 
 				//Check for Early Registration discount
 				if (early_discount_amount($event_id, $member_price) != false) {
