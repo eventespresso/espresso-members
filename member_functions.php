@@ -348,15 +348,22 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 //Creates dropdowns if multiple prices are associated with an event
 if (!function_exists('event_espresso_member_price_dropdown')) {
 
-	function event_espresso_member_price_dropdown($event_id, $show_label = 1, $multi_reg = 0, $current_value = '', $label = '') {
+	function event_espresso_member_price_dropdown($event_id, $atts = '' ) {
 
 		//Attention:
 		//This is a copy of a core function. Any changes made here should be added to the core function of the same name
 
 		global  $wpdb, $org_options, $espresso_premium;
-
 		if ($espresso_premium != true)
             return;
+		
+		empty($atts) ? '' : extract($atts);
+		//Debug
+		//echo "<pre>atts -".print_r($atts,true)."</pre>";
+
+		$show_label = $show_label == '' ? 1 : $show_label;
+		$multi_reg = $multi_reg == '' ? 0 : $multi_reg;
+		$option_name = $option_name == '' ? 'price_option' : $option_name;
 
 		//Default values
 		$html = '';
@@ -377,16 +384,20 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
         } else {
            $sql = "SELECT id, event_cost, surcharge, surcharge_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
         }
+		
 		$prices = $wpdb->get_results($sql);
 
 		//If more than one price was added to an event, we need to create a drop down to select the price.
 		if ($wpdb->num_rows > 1) {
 
 			//Create the label for the drop down
-			$html .= $show_label == 1 ? '<label for="event_cost">' . $label . '</label>' : '';
+			$html .= $show_label == 1 ? '<label for="price_option">' . $label . '</label>' : '';
 
 			//Create a dropdown of prices
-			$html .= '<select name="price_option" id="price_option-' . $event_id . '">';
+			$html .= '<select name="'.$option_name . $multi_name_adjust . '" id="price_option-' . $event_id . '">';
+			
+			if ( is_admin() )
+				$html .= '<option ' . $selected . ' value="">None</option>';
 
 			foreach ($prices as $price) {
 
@@ -418,6 +429,12 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 				//Using price ID
 				//If the price id was passed to this function, we need need to select that price.
 				$selected = $current_value == $price->id ? 'selected="selected" ' : '';
+				
+				if ( !empty($selected_price_type) ){
+					if ( $member_price_type == $selected_price_type) {
+						$selected  = 'selected="selected" ';
+					}
+				}
 
 				//Create the drop down options
 				$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . ') ' . $surcharge . ' </option>';
@@ -429,6 +446,11 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 
 		//If a single price was added to an event, then create the price display and hidden fields to hold the additional information.
 		} else if ($wpdb->num_rows == 1) {
+			if ( is_admin() ){
+				if ( isset($_REQUEST['event_admin_reports']) && $_REQUEST['event_admin_reports'] == 'edit_attendee_record' ){
+					$member_label = __('Member', 'event_espresso').' ';
+				}
+			}
             foreach ($prices as $price) {
 
 				//Convert to the member price if the user is logged in
@@ -455,7 +477,7 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 				}
 
 				//Create the single price display
-				$html .= '<span class="event_price_label">' . __('Price: ', 'event_espresso') . '</span> <span class="event_price_value">' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . $surcharge . '</span>';
+				$html .= '<span class="event_price_label">' . $member_label . __('Price: ', 'event_espresso') . '</span> <span class="event_price_value">' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . $surcharge . '</span>';
 
 				//Create hidden fields to pass additional information to the add_attendees_to_db function
 				$html .= '<input type="hidden" name="price_id" id="price_id-' . $event_id . '" value="' . $price->id . '">';
@@ -475,6 +497,7 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 
 if ( !function_exists('espresso_member_price_select_action') ){
 	function espresso_member_price_select_action($event_id, $atts = '' ){
+		
 		$html = '';
 		$html .= is_admin() ? '' : '<p class="event_prices">';
 		$html .= event_espresso_member_price_dropdown($event_id, $atts);
@@ -482,8 +505,11 @@ if ( !function_exists('espresso_member_price_select_action') ){
 		echo $html;
 		return;
 	}
-	remove_action('espresso_price_select', 'espresso_price_select_action');
-	add_action('espresso_price_select', 'espresso_member_price_select_action', 10, 2);
+	if (!is_admin() ){
+		remove_action('espresso_price_select', 'espresso_price_select_action');
+		add_action('espresso_price_select', 'espresso_member_price_select_action', 10, 2);
+	}
+	add_action('espresso_member_price_select_action', 'espresso_member_price_select_action', 10, 2);
 }
 
 /*
