@@ -4,7 +4,7 @@ Plugin Name: Event Espresso - Members Addon
 Plugin URI: http://eventespresso.com/
 Description: Member integration addon for Event Espresso. <a href="admin.php?page=support" >Support</a>
 
-Version: 1.9
+Version: 2.0
 
 Author: Seth Shoultes
 Author URI: http://www.eventespresso.com
