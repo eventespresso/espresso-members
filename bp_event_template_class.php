@@ -298,19 +298,3 @@ function bp_event_permalink() {
 	}
 	function bp_event_link() { echo bp_get_event_permalink(); }
 	function bp_get_event_link() { return bp_get_event_permalink(); }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>

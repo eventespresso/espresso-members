@@ -732,35 +732,6 @@ function event_espresso_get_add_register_button( $event_id = 0 ) {
 	return bp_get_button( apply_filters( 'event_espresso_get_add_register_button', $button ) );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * event_espresso_core_get_events()
  *
@@ -783,8 +754,6 @@ function event_espresso_core_get_events( $args = '' ) {
 	$params = wp_parse_args( $args, $defaults );
 	extract( $params, EXTR_SKIP );
 
-	return apply_filters( 'event_espresso_core_get_events', Event_Espresso_Event::get_events( $type, $per_page, $page, $event_id, $include, $search_terms, $populate_extras ), &$params );	
-
-
+	return apply_filters( 'event_espresso_core_get_events', Event_Espresso_Event::get_events( $type, $per_page, $page, $event_id, $include, $search_terms, $populate_extras ), &$params );
 
 }

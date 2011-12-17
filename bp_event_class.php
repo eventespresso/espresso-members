@@ -336,7 +336,3 @@ function event_espresso_event_attendees() {
 		return apply_filters( 'event_espresso_get_event_attendees', $html );
 
 	}
-	
-	
-	
-?>

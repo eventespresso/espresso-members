@@ -12,69 +12,83 @@
             return;
         ?>
 
-        <h3><?php _e('Events Profile Information', 'event_espresso'); ?></h3>
-        <a name="event_espresso_profile" id="event_espresso_profile"></a>
-        <table class="form-table">
-
-            <tr>
-                <th><label for="event_espresso_address"><?php _e('Address/Street/Number', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_address" id="event_espresso_address" value="<?php echo esc_attr(get_the_author_meta('event_espresso_address', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your Address/Street/Number.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_address2"><?php _e('Address 2', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_address2" id="event_espresso_address2" value="<?php echo esc_attr(get_the_author_meta('event_espresso_address2', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Optional', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_city"><?php _e('City/Town/Village', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_city" id="event_espresso_city" value="<?php echo esc_attr(get_the_author_meta('event_espresso_city', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your City/Town/Village.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_state"><?php _e('State/County/Province', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_state" id="event_espresso_state" value="<?php echo esc_attr(get_the_author_meta('event_espresso_state', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your State/County/Province.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_zip"><?php _e('Zip/Postal Code', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_zip" id="event_espresso_zip" value="<?php echo esc_attr(get_the_author_meta('event_espresso_zip', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your Zip/Postal Code.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_country"><?php _e('Country', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_country" id="event_espresso_country" value="<?php echo esc_attr(get_the_author_meta('event_espresso_country', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your Country.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="event_espresso_phone"><?php _e('Phone Number', 'event_espresso'); ?></label></th>
-
-                <td>
-                    <input type="text" name="event_espresso_phone" id="event_espresso_phone" value="<?php echo esc_attr(get_the_author_meta('event_espresso_phone', $user->ID)); ?>" class="regular-text" /><br />
-                    <span class="description"><?php _e('Please enter your Phone Number.', 'event_espresso'); ?></span>
-                </td>
-            </tr>
-
-        </table>
-        <?php
+<h3>
+	<?php _e('Events Profile Information', 'event_espresso'); ?>
+</h3>
+<a name="event_espresso_profile" id="event_espresso_profile"></a>
+<table class="form-table">
+	<tr>
+		<th><label for="event_espresso_address">
+				<?php _e('Address/Street/Number', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_address" id="event_espresso_address" value="<?php echo esc_attr(get_the_author_meta('event_espresso_address', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your Address/Street/Number.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_address2">
+				<?php _e('Address 2', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_address2" id="event_espresso_address2" value="<?php echo esc_attr(get_the_author_meta('event_espresso_address2', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Optional', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_city">
+				<?php _e('City/Town/Village', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_city" id="event_espresso_city" value="<?php echo esc_attr(get_the_author_meta('event_espresso_city', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your City/Town/Village.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_state">
+				<?php _e('State/County/Province', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_state" id="event_espresso_state" value="<?php echo esc_attr(get_the_author_meta('event_espresso_state', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your State/County/Province.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_zip">
+				<?php _e('Zip/Postal Code', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_zip" id="event_espresso_zip" value="<?php echo esc_attr(get_the_author_meta('event_espresso_zip', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your Zip/Postal Code.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_country">
+				<?php _e('Country', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_country" id="event_espresso_country" value="<?php echo esc_attr(get_the_author_meta('event_espresso_country', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your Country.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+	<tr>
+		<th><label for="event_espresso_phone">
+				<?php _e('Phone Number', 'event_espresso'); ?>
+			</label></th>
+		<td><input type="text" name="event_espresso_phone" id="event_espresso_phone" value="<?php echo esc_attr(get_the_author_meta('event_espresso_phone', $user->ID)); ?>" class="regular-text" />
+			<br />
+			<span class="description">
+			<?php _e('Please enter your Phone Number.', 'event_espresso'); ?>
+			</span></td>
+	</tr>
+</table>
+<?php
     }
 
     add_action('personal_options_update', 'event_espresso_extra_profile_fields');
@@ -150,14 +164,16 @@ function event_espresso_member_only($member_only = 'N') {
     if ($espresso_premium != true)
         return;
     ?>
-    <p><?php
+<p>
+	<?php
     _e('Member only event? ', 'event_espresso');
     $values = array(
         array('id' => 'N', 'text' => __('No', 'event_espresso')),
         array('id' => 'Y', 'text' => __('Yes', 'event_espresso')));
     echo select_input('member_only', $values, $member_only);
-    ?></p>
-    <?php
+    ?>
+</p>
+<?php
 }
 
 function event_espresso_user_login_link() {
@@ -252,19 +268,23 @@ function event_espresso_member_only_pricing($event_id = 'NULL') {
     if ($espresso_premium != true)
         return;
     ?>
-    <fieldset id="members-pricing">
-        <legend><?php _e('Member Pricing', 'event_espresso'); ?></legend>
-        <?php
+<fieldset id="members-pricing">
+	<legend>
+	<?php _e('Member Pricing', 'event_espresso'); ?>
+	</legend>
+	<?php
         if ($event_id == 0) {
             event_espresso_member_pricing_new();
         } else {
             event_espresso_member_pricing_update($event_id);
         }
         ?>
-        <p><input class="button" type="button" value="<?php _e('Add A Member Price', 'event_espresso'); ?>" onclick="addMemberPriceInput('dynamicMemberPriceInput');"></p>
-    </fieldset>
-    </td>
-    <?php
+	<p>
+		<input class="button" type="button" value="<?php _e('Add A Member Price', 'event_espresso'); ?>" onclick="addMemberPriceInput('dynamicMemberPriceInput');">
+	</p>
+</fieldset>
+</td>
+<?php
 }
 
 if (!function_exists('event_espresso_member_pricing_update')) {
@@ -276,8 +296,8 @@ if (!function_exists('event_espresso_member_pricing_update')) {
         global $wpdb;
         $member_price_counter = 1;
         ?>
-        <ul id="dynamicMemberPriceInput">
-        <?php
+<ul id="dynamicMemberPriceInput">
+	<?php
         $member_prices = $wpdb->get_results("SELECT member_price, member_price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id = '" . $event_id . "' ORDER BY id");
         foreach ($member_prices as $member_price) {
             echo '<li><label for="add-member-name-"' . $member_price_counter++ . '">' . __('Name', 'event_espresso') . ' ' . $member_price_counter++ . ':</label><input id="add-member-name-' . $member_price_counter++ . '" size="10"  type="text" name="member_price_type[]" value="' . $member_price->member_price_type . '"> ';
@@ -287,14 +307,14 @@ if (!function_exists('event_espresso_member_pricing_update')) {
             echo '</li>';
         }
         ?>
-        </ul>
-        <p>
-        <?php _e('(enter 0.00 for free events, enter 2 place decimal i.e. ' . $org_options['currency_symbol'] . '7.00)', 'event_espresso'); ?>
-        </p>
-        <p><?php _e('<span class="important">Note:</span> A non-member price MUST be entered for each row, even if this is a member only event.', 'event_espresso'); ?></p>
-
-
-        <script type="text/javascript">
+</ul>
+<p>
+	<?php _e('(enter 0.00 for free events, enter 2 place decimal i.e. ' . $org_options['currency_symbol'] . '7.00)', 'event_espresso'); ?>
+</p>
+<p>
+	<?php _e('<span class="important">Note:</span> A non-member price MUST be entered for each row, even if this is a member only event.', 'event_espresso'); ?>
+</p>
+<script type="text/javascript">
 
             //Dynamic form fields
             var member_price_counter = '<?php echo $member_price_counter++ ?>';
@@ -305,7 +325,7 @@ if (!function_exists('event_espresso_member_pricing_update')) {
                 member_price_counter++;
             }
         </script>
-        <?php
+<?php
     }
 }
 
@@ -316,20 +336,25 @@ if (!function_exists('event_espresso_member_pricing_new')) {
             return;
         $member_price_counter = 1;
         ?>
-        <ul id="dynamicMemberPriceInput">
-            <li>
-                <label for="add-member-name-<?php echo $member_price_counter ?>"><?php _e('Name ', 'event_espresso'); ?><?php echo $member_price_counter++ ?>:</label>
-                <input size="10" id="add-member-name-<?php echo $member_price_counter ?>" type="text"  name="member_price_type[]">
-                <label for="add-member-price-<?php echo $member_price_counter ?>"><?php _e('Price', 'event_espresso'); ?>:<?php echo $org_options['currency_symbol'] ?></label>
-                <input size="5" id="add-member-price-<?php echo $member_price_counter ?>" type="text"  name="member_price[]">
-                <img class="remove-item" title="<?php echo __('Remove this Attendee', 'event_espresso') ?>" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/remove.gif" alt="<?php echo __('Remove Attendee', 'event_espresso') ?>" />
-            </li>
-        </ul>
-        <p>
-        <?php _e('(enter 0.00 for free events, enter 2 place decimal i.e. 7.00)', 'event_espresso'); ?>
-        </p>
-        <p><?php _e('<span class="important">Note:</span> A non-member price MUST be entered, even if this is a member only event.', 'event_espresso'); ?></p>
-        <script type="text/javascript">
+<ul id="dynamicMemberPriceInput">
+	<li>
+		<label for="add-member-name-<?php echo $member_price_counter ?>">
+			<?php _e('Name ', 'event_espresso'); ?>
+			<?php echo $member_price_counter++ ?>:</label>
+		<input size="10" id="add-member-name-<?php echo $member_price_counter ?>" type="text"  name="member_price_type[]">
+		<label for="add-member-price-<?php echo $member_price_counter ?>">
+			<?php _e('Price', 'event_espresso'); ?>
+			:<?php echo $org_options['currency_symbol'] ?></label>
+		<input size="5" id="add-member-price-<?php echo $member_price_counter ?>" type="text"  name="member_price[]">
+		<img class="remove-item" title="<?php echo __('Remove this Attendee', 'event_espresso') ?>" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/remove.gif" alt="<?php echo __('Remove Attendee', 'event_espresso') ?>" /> </li>
+</ul>
+<p>
+	<?php _e('(enter 0.00 for free events, enter 2 place decimal i.e. 7.00)', 'event_espresso'); ?>
+</p>
+<p>
+	<?php _e('<span class="important">Note:</span> A non-member price MUST be entered, even if this is a member only event.', 'event_espresso'); ?>
+</p>
+<script type="text/javascript">
 
             //Dynamic form fields
             var member_price_counter = <?php echo $member_price_counter++ ?>;
@@ -340,8 +365,8 @@ if (!function_exists('event_espresso_member_pricing_new')) {
                 member_price_counter++;
             }
         </script>
-        </li>
-        <?php
+</li>
+<?php
     }
 }
 
