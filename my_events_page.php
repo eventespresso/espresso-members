@@ -35,7 +35,7 @@ function event_espresso_my_events(){
 	}
 ?>
 			<form id="form1" name="form1" method="post" action="<?php echo $_SERVER["REQUEST_URI"]?>">
-				<table id="table" class="widefat fixed" width="100%">
+				<table id="table" class="widefat" width="100%">
 					<thead>
 						<tr>
 							<th class="manage-column column-cb check-column" id="cb" scope="col" style="width:5%;"></th>
