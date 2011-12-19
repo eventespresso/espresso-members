@@ -9,7 +9,7 @@ Version: 2.0
 Author: Seth Shoultes
 Author URI: http://www.eventespresso.com
 
-Copyright (c) 2008-2011 Seth Shoultes  All Rights Reserved.
+Copyright (c) 2008-2012 Event Espresso  All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,14 +30,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 require_once("member_functions.php");
 require_once("user_settings_page.php");
 require_once("my_events_page.php");
-
-/* Only load code that needs BuddyPress to run once BP is loaded and initialized. */
-function espresso_bp_init() {
-	require_once("bp_event_class.php");
-	require_once("bp_event_template_class.php");
-	require_once("bp_functions.php");
-}
-add_action( 'bp_include', 'espresso_bp_init' );
 
 function event_espresso_members_install(){
 //Members Addon database install
@@ -62,7 +54,7 @@ register_activation_hook(__FILE__,'event_espresso_members_install');//Install me
 register_deactivation_hook(__FILE__,'event_espresso_members_deactivate');
 
 global $wpdb;
-define("EVENTS_MEMBER_REL_TABLE",  $wpdb->prefix . "events_member_rel"); //Define Groupon db table shortname
+define("EVENTS_MEMBER_REL_TABLE",  $wpdb->prefix . "events_member_rel");
 define("EVNT_MBR_PLUGINPATH", "/" . plugin_basename( dirname(__FILE__) ) . "/");
 define("EVENT_ESPRESSO_MEMBERS_DIR", WP_PLUGIN_DIR . EVNT_MBR_PLUGINPATH  );
 define("EVNT_MBR_PLUGINFULLURL", WP_PLUGIN_URL . EVNT_MBR_PLUGINPATH );
