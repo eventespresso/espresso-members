@@ -26,10 +26,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-//Load the member files
-require_once("member_functions.php");
-require_once("user_settings_page.php");
-require_once("my_events_page.php");
+function espresso_load_member_files() {
+	//Load the member files
+	require_once("member_functions.php");
+	require_once("user_settings_page.php");
+	require_once("my_events_page.php");
+}
+add_action( 'plugins_loaded', 'espresso_load_member_files', 1 );
 
 function event_espresso_members_install(){
 //Members Addon database install
