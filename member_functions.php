@@ -231,7 +231,7 @@ function event_espresso_add_user_to_event($event_id, $userid, $attendee_id) {
  *
  * @params string $date
  */
-if (!function_exists('event_espresso_get_price')) {
+//if (!function_exists('event_espresso_get_price')) {
 
     function event_espresso_get_price($event_id) {
         global $espresso_premium;
@@ -261,7 +261,7 @@ if (!function_exists('event_espresso_get_price')) {
         return $event_cost;
     }
 
-}
+//}
 
 function event_espresso_member_only_pricing($event_id = 'NULL') {
     global $espresso_premium;
@@ -371,9 +371,9 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 }
 
 //Creates dropdowns if multiple prices are associated with an event
-if (!function_exists('event_espresso_member_price_dropdown')) {
+//if (!function_exists('event_espresso_member_price_dropdown')) {
 
-	function event_espresso_member_price_dropdown($event_id, $atts = '' ) {
+	function event_espresso_price_dropdown($event_id, $atts = '' ) {
 
 		//Attention:
 		//This is a copy of a core function. Any changes made here should be added to the core function of the same name
@@ -414,6 +414,7 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 
 		//If more than one price was added to an event, we need to create a drop down to select the price.
 		if ($wpdb->num_rows > 1) {
+
 
 			//Create the label for the drop down
 			$html .= $show_label == 1 ? '<label for="price_option">' . $label . '</label>' : '';
@@ -518,7 +519,7 @@ if (!function_exists('event_espresso_member_price_dropdown')) {
 		return  $html;
     }
 
-}
+//}
 
 if ( !function_exists('espresso_member_price_select_action') ){
 	function espresso_member_price_select_action($event_id, $atts = '' ){
