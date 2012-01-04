@@ -526,7 +526,7 @@ if ( !function_exists('espresso_member_price_select_action') ){
 		
 		$html = '';
 		$html .= is_admin() ? '' : '<p class="event_prices">';
-		$html .= event_espresso_member_price_dropdown($event_id, $atts);
+		$html .= event_espresso_price_dropdown($event_id, $atts);
 		$html .= is_admin() ? '' : '</p>';
 		echo $html;
 		return;
