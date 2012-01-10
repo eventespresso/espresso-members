@@ -386,10 +386,24 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 		//Debug
 		//echo "<pre>atts -".print_r($atts,true)."</pre>";
 
-		$show_label = $show_label == '' ? 1 : $show_label;
-		$multi_reg = $multi_reg == '' ? 0 : $multi_reg;
-		$option_name = $option_name == '' ? 'price_option' : $option_name;
-
+		// set defaults or unset or empty attributes
+		if ( ! isset( $show_label ) or $show_label == ''  ) {
+			$show_label = TRUE;
+		} 
+		
+		if ( ! isset( $multi_reg ) or $multi_reg == ''  ) {
+			$multi_reg = FALSE;
+		} 
+		
+		if ( ! isset( $option_name ) or $option_name == ''  ) {
+			$option_name = 'price_option';
+		} 
+		
+		
+//		$show_label = $show_label == '' ? 1 : $show_label;
+//		$multi_reg = $multi_reg == '' ? 0 : $multi_reg;
+//		$option_name = $option_name == '' ? 'price_option' : $option_name;
+//
 		//Default values
 		$html = '';
 		$early_bird_message = '';
@@ -397,7 +411,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 		$label = $label == '' ? __('Choose an Option: ', 'event_espresso') : $label;
 
 		//Will make the name an array and put the time id as a key so we know which event this belongs to
-        $multi_name_adjust = $multi_reg == 1 ? "[$event_id]" : '';
+        $multi_name_adjust = $multi_reg ? "[$event_id]" : '';
 
 		//Gets the surcharge text
 		$surcharge_text = isset($org_options['surcharge_text']) ? $org_options['surcharge_text'] : __('Surcharge', 'event_espresso');
@@ -417,7 +431,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 
 
 			//Create the label for the drop down
-			$html .= $show_label == 1 ? '<label for="price_option">' . $label . '</label>' : '';
+			$html .= $show_label ? '<label for="price_option">' . $label . '</label>' : '';
 
 			//Create a dropdown of prices
 			$html .= '<select name="'.$option_name . $multi_name_adjust . '" id="price_option-' . $event_id . '">';
@@ -532,8 +546,8 @@ if ( !function_exists('espresso_member_price_select_action') ){
 		return;
 	}
 	if (!is_admin() ){
-		remove_action('espresso_price_select', 'espresso_price_select_action');
-		add_action('espresso_price_select', 'espresso_member_price_select_action', 10, 2);
+		remove_action('hook_espresso_price_select', 'espresso_price_select_action');
+		add_action('hook_espresso_price_select', 'espresso_member_price_select_action', 10, 2);
 	}
 	add_action('espresso_member_price_select_action', 'espresso_member_price_select_action', 10, 2);
 }
