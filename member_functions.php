@@ -468,7 +468,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 
 				//Using price ID
 				//If the price id was passed to this function, we need need to select that price.
-				$selected = $current_value == $price->id ? 'selected="selected" ' : '';
+				$selected = isset($current_value) && $current_value == $price->id ? 'selected="selected" ' : '';
 				
 				if ( !empty($selected_price_type) ){
 					if ( $member_price_type == $selected_price_type) {
