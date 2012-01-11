@@ -24,8 +24,8 @@ global $notices;
 	<div id="icon-options-event" class="icon32"></div>
 	<h2><?php echo _e('Manage Member Settings', 'event_espresso') ?></h2>
 	<?php 
-		if( did_action('espresso_admin_notices') == false){
-		do_action('espresso_admin_notices'); 
+		if( did_action( 'action_hook_espresso_admin_notices') == false){
+		do_action( 'action_hook_espresso_admin_notices'); 
 		}?>
 	<div id="poststuff" class="metabox-holder has-right-sidebar">
 		<?php event_espresso_display_right_column(); ?>
