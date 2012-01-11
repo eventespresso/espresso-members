@@ -486,12 +486,16 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 
 		//If a single price was added to an event, then create the price display and hidden fields to hold the additional information.
 		} else if ($wpdb->num_rows == 1) {
+		
+			$member_label = '';
+			
 			if ( is_admin() ){
 				if ( isset($_REQUEST['event_admin_reports']) && $_REQUEST['event_admin_reports'] == 'edit_attendee_record' ){
 					$member_label = __('Member', 'event_espresso').' ';
 				}
 			}
-            foreach ($prices as $price) {
+			
+			foreach ($prices as $price) {
 
 				//Convert to the member price if the user is logged in
                 if (is_user_logged_in()) {
@@ -546,10 +550,10 @@ if ( !function_exists('espresso_member_price_select_action') ){
 		return;
 	}
 	if (!is_admin() ){
-		remove_action('hook_espresso_price_select', 'espresso_price_select_action');
-		add_action('hook_espresso_price_select', 'espresso_member_price_select_action', 10, 2);
+		remove_action('action_hook_espresso_price_select', 'espresso_price_select_action');
+		add_action('action_hook_espresso_price_select', 'espresso_member_price_select_action', 10, 2);
 	}
-	add_action('espresso_member_price_select_action', 'espresso_member_price_select_action', 10, 2);
+	add_action('action_hook_espresso_member_price_select_action', 'espresso_member_price_select_action', 10, 2);
 }
 
 /*
