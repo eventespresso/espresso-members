@@ -373,7 +373,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 //Creates dropdowns if multiple prices are associated with an event
 //if (!function_exists('event_espresso_member_price_dropdown')) {
 
-	function event_espresso_price_dropdown($event_id, $atts = '' ) {
+	function event_espresso_member_price_dropdown($event_id, $atts = '' ) {
 
 		//Attention:
 		//This is a copy of a core function. Any changes made here should be added to the core function of the same name
@@ -544,7 +544,7 @@ if ( !function_exists('espresso_member_price_select_action') ){
 		
 		$html = '';
 		$html .= is_admin() ? '' : '<p class="event_prices">';
-		$html .= event_espresso_price_dropdown($event_id, $atts);
+		$html .= event_espresso_member_price_dropdown($event_id, $atts);
 		$html .= is_admin() ? '' : '</p>';
 		echo $html;
 		return;
