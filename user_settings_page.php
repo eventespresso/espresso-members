@@ -10,9 +10,9 @@ global $notices;
 		$member_options['member_only_all'] = $_POST['member_only_all'];
 		$member_options['autofilled_editable'] = $_POST['autofilled_editable'];
 		update_option('events_member_settings', $member_options);
-		$notices['updates'][] = __('Member settings saved', 'event_espresso');		
+		$notices['updates'][] = __('Member settings saved', 'event_espresso');
 	}
-	
+
 	$member_options = get_option('events_member_settings');
 	$login_page = empty($member_options['login_page']) ? '' : $member_options['login_page'];
 	$register_page = empty($member_options['register_page']) ? '' : $member_options['register_page'];
@@ -23,13 +23,15 @@ global $notices;
 <div id="members-settings" class="wrap">
 	<div id="icon-options-event" class="icon32"></div>
 	<h2><?php echo _e('Manage Member Settings', 'event_espresso') ?></h2>
-	<?php 
+	<?php
 		if( did_action( 'action_hook_espresso_admin_notices') == false){
-		do_action( 'action_hook_espresso_admin_notices'); 
+		do_action( 'action_hook_espresso_admin_notices');
 		}?>
-	<div id="poststuff" class="metabox-holder has-right-sidebar">
-		<?php event_espresso_display_right_column(); ?>
-		<div id="post-body">
+		<div id="poststuff" class="metabox-holder has-right-sidebar">
+			<div id="side-info-column" class="inner-sidebar">
+				<?php do_meta_boxes('event-espresso_page_members', 'side', null); ?>
+			</div>
+			<div id="post-body">
 			<div id="post-body-content">
 				<div class="meta-box-sortables ui-sortables">
 					<?php #### metabox #### ?>
@@ -59,7 +61,7 @@ global $notices;
 															<?php _e('New user registration is currently closed. If you would like to set a custom user regsistration page, you must enable "Anyone can register" in your Wordpress "<a href="options-general.php">General Settings</a>" page.', 'event_espresso') ?>
 														</p></td>
 												</tr>
-												<?php  
+												<?php
 											} else {?>
 												<tr>
 													<th> <label>
@@ -68,7 +70,7 @@ global $notices;
 													</th>
 													<td><input name="register_page" size="25" <?php echo (isset($register_page) ? 'value="' . $register_page . '"' : "") ?> /></td>
 												</tr>
-												<?php 
+												<?php
 											} ?>
 												<tr>
 													<th> <label>
@@ -103,23 +105,23 @@ global $notices;
 										</p>
 									</form>
 								</div>
-								<!-- / .padding --> 
+								<!-- / .padding -->
 							</div>
-							<!-- / .inside --> 
+							<!-- / .inside -->
 						</div>
-						<!-- /.postbox --> 
+						<!-- /.postbox -->
 					</div>
 					<!-- .metabox-holder -->
 					<?php #### close metabox #### ?>
 				</div>
-				<!-- / #post-body-content --> 
+				<!-- / #post-body-content -->
 			</div>
-			<!-- / #post-body --> 
+			<!-- / #post-body -->
 		</div>
-		<!-- / #poststuff --> 
+		<!-- / #poststuff -->
 	</div>
 </div>
-<!-- / .wrap --> 
+<!-- / .wrap -->
 <script type="text/javascript" charset="utf-8">
 		//<![CDATA[
 		jQuery(document).ready(function() {
