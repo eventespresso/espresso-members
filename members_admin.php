@@ -10,10 +10,10 @@ function espresso_event_editor_members_meta_box($event) {
 
 function espresso_register_members_event_editor_meta_boxes() {
 	global $org_options;
-	add_meta_box('espresso_event_editor_members_box', __('Member Options', 'event_espresso'), 'espresso_event_editor_members_meta_box', 'toplevel_page_events', 'side', 'high');
+	add_meta_box('espresso_event_editor_members_box', __('Member Options', 'event_espresso'), 'espresso_event_editor_members_meta_box', 'toplevel_page_events', 'side', 'default');
 }
 
-add_action('current_screen', 'espresso_register_members_event_editor_meta_boxes');
+add_action('current_screen', 'espresso_register_members_event_editor_meta_boxes', 30);
 
 		//Member Settings
 function espresso_add_members_to_admin_menu($espresso_manager) {
