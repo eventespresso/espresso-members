@@ -93,7 +93,7 @@ function event_espresso_my_events(){
 						$payment_link = get_option('siteurl') . "/?page_id=" . $org_options['return_url'] . "&id=" . $attendee_id;
 						$payment_status = '<a href="' . $payment_link . '">Pay Now</a>';
 					}
-					$event_url = home_url() . "/?page_id=" . $org_options['event_page_id']. "&regevent_action=register&event_id=". $event_id;
+					$event_url = home_url() . "/?page_id=" . $org_options['event_page_id']. "&e_reg=register&event_id=". $event_id;
 					$event_link = '<a class="row-title" href="' . $event_url . '">' . stripslashes_deep($event->event_name) . '</a>';
 					//Build the payment link
 					$payment_url = home_url() . "/?page_id=" . $org_options['return_url'] . "&amp;registration_id=" . $registration_id;
