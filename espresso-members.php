@@ -31,7 +31,6 @@ if (is_admin()) {
 function espresso_load_member_files() {
 	//Load the member files
 	require_once("member_functions.php");
-	require_once("user_settings_page.php");
 	require_once("my_events_page.php");
 }
 add_action( 'plugins_loaded', 'espresso_load_member_files', 1 );
