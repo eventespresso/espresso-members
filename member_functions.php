@@ -194,29 +194,6 @@ function event_espresso_add_user_to_event($event_id, $userid, $attendee_id) {
 	$sql = "INSERT INTO " . EVENTS_MEMBER_REL_TABLE . "(event_id, user_id, attendee_id, user_role) VALUES ('" . $event_id . "', '" . $userid . "', '" . $attendee_id . "', '" . $user_role . "')";
 	$wpdb->query($wpdb->prepare($sql));
 
-
-	// If BuddyPress is installed, add an item to the activity stream
-	if (function_exists('bp_is_active') && bp_is_active('activity')) {
-
-		// get title of event to add into activity
-		$event_name = $wpdb->get_var($wpdb->prepare("SELECT event_name FROM " . EVENTS_DETAIL_TABLE . " WHERE id = " . $event_id));
-
-		$component = "event_espresso";
-		$type = "register_event";
-
-		$entry = array(
-				'action' => sprintf(__('%1$s registered for %2$s', 'event_espresso'), bp_core_get_userlink($bp->loggedin_user->id), $event_name),
-				'component' => $component,
-				'type' => $type,
-				'primary_link' => bp_core_get_user_domain($user_id),
-				'user_id' => $bp->loggedin_user->id,
-				'item_id' => $event_id,
-				'secondary_item_id' => $event_id
-		);
-
-
-		return bp_activity_add(apply_filters('event_espresso_record_activity', $entry));
-	}
 }
 
 /*
