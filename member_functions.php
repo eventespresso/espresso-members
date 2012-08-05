@@ -445,8 +445,8 @@ function event_espresso_price_dropdown($event_id, $show_label = 1, $multi_reg = 
 			  $html .= '<input type="hidden" name="price_id" id="price_id-' . $event_id . '" value="' . $price->id . '">';
 			  $html .= '<input type="hidden" name="event_cost' . $multi_name_adjust . '" id="event_cost-' . $price->id . '" value="' . number_format($price->event_cost, 2, '.', '') . '">';
 		  } else {
-		    $html .= '<span class="free_event">' . __('Free Event', 'event_espresso') . '</span>';
-  		  $html .= '<input type="hidden" name="payment' . $multi_name_adjust . '" id="payment-' . $event_id . '" value="' . __('free event', 'event_espresso') . '">';
+		      $html .= '<span class="free_event">' . __('Free Event', 'event_espresso') . '</span>';
+  		    $html .= '<input type="hidden" name="payment' . $multi_name_adjust . '" id="payment-' . $event_id . '" value="' . __('free event', 'event_espresso') . '">';
 		    }
 	    }
     }
