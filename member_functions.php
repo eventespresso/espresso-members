@@ -342,11 +342,11 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 //Creates dropdowns if multiple prices are associated with an event
 //if (!function_exists('event_espresso_member_price_dropdown')) {
 
-function event_espresso_price_dropdown($event_id, $show_label = 1, $multi_reg = 0, $current_value = '', $label = '') {
+function event_espresso_price_dropdown($event_id, $atts) {
 	do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, '');
 	//Attention:
 	//This is a copy of a core function. Any changes made here should be added to the core function of the same name
-
+	extract($atts);
 	global $wpdb, $org_options, $espresso_premium;
 
 	if ($espresso_premium != true)
@@ -356,10 +356,10 @@ function event_espresso_price_dropdown($event_id, $show_label = 1, $multi_reg = 
 	$html = '';
 	$early_bird_message = '';
 	$surcharge = '';
-	$label = $label == '' ? __('Choose an Option: ', 'event_espresso') : $label;
+	$label = isset($label) && $label != '' ? $label : __('Choose an Option: ', 'event_espresso');
 
 	//Will make the name an array and put the time id as a key so we know which event this belongs to
-	$multi_name_adjust = $multi_reg == 1 ? "[$event_id]" : '';
+	$multi_name_adjust = isset($multi_reg) && $multi_reg == true ? "[$event_id]" : '';
 
 	//Gets the surcharge text
 	$surcharge_text = isset($org_options['surcharge_text']) ? $org_options['surcharge_text'] : __('Surcharge', 'event_espresso');
@@ -404,7 +404,8 @@ function event_espresso_price_dropdown($event_id, $show_label = 1, $multi_reg = 
 
 			//Using price ID
 			//If the price id was passed to this function, we need need to select that price.
-			$selected = $current_value == $price->id ? 'selected="selected" ' : '';
+			$selected = isset($current_value) && $current_value == $result->id ? ' selected="selected" ' : '';
+
 
 			//Create the drop down options
 			$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '') . $early_bird_message . ') ' . $surcharge . ' </option>';
@@ -497,7 +498,7 @@ if (!function_exists('event_espresso_get_final_price')) {
 					if ($early_price_data = early_discount_amount($event_id, $event_cost)) {
 						$event_cost = $early_price_data['event_price'];
 					}
-					$surcharge = $result->surcharge; //by default it’s 0. if flat rate, will just be formatted and atted to the total
+					$surcharge = $result->surcharge; //by default it's 0. if flat rate, will just be formatted and atted to the total
 					if ($result->surcharge > 0 && $result->surcharge_type == 'pct') { //if >0 and is percent, calculate surcharg amount to be added to total
 						$surcharge = $event_cost * $result->surcharge / 100;
 					}
