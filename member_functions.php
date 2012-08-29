@@ -356,7 +356,7 @@ function event_espresso_price_dropdown($event_id, $atts) {
 	$html = '';
 	$early_bird_message = '';
 	$surcharge = '';
-	$label = isset($label) && $label != '' ? $label : __('Choose an Option: ', 'event_espresso');
+	$label = isset($label) && $label != '' ? $label : '<span class="section-title">'.__('Choose an Option: ', 'event_espresso').'</span>';
 
 	//Will make the name an array and put the time id as a key so we know which event this belongs to
 	$multi_name_adjust = isset($multi_reg) && $multi_reg == true ? "[$event_id]" : '';
@@ -462,13 +462,13 @@ if (!function_exists('espresso_member_price_select_action')) {
 	function espresso_member_price_select_action($event_id, $atts = '') {
 		do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, '');
 		$html = '';
-		$html .= is_admin() ? '' : '<p class="event_prices">';
+		//$html .= is_admin() ? '' : '<p class="event_prices">';
 		$html .= event_espresso_price_dropdown($event_id, $atts);
-		$html .= is_admin() ? '' : '</p>';
+		//$html .= is_admin() ? '' : '</p>';
 		echo $html;
 		return;
 	}
-
+	remove_action('espresso_price_select', 'event_espresso_price_dropdown');
 	remove_action('espresso_price_select', 'espresso_price_select_action');
 	add_action('espresso_price_select', 'espresso_member_price_select_action', 10, 2);
 }
