@@ -4,10 +4,10 @@
 function event_espresso_member_config_mnu() {
 	if (!empty($_POST['update_member_settings']) && $_POST['update_member_settings'] == 'update') {
 		$member_options = get_option('events_member_settings');
-		$member_options['login_page'] = $_POST['login_page'];
-		$member_options['register_page'] = $_POST['register_page'];
-		$member_options['member_only_all'] = $_POST['member_only_all'];
-		$member_options['autofilled_editable'] = $_POST['autofilled_editable'];
+		$member_options['login_page'] = isset($_POST['login_page']) && !empty($_POST['login_page']) ? $_POST['login_page'] : '';
+		$member_options['register_page'] = isset($_POST['register_page']) && !empty($_POST['register_page']) ? $_POST['register_page'] : '';
+		$member_options['member_only_all'] = isset($_POST['member_only_all']) && !empty($_POST['member_only_all']) ? $_POST['member_only_all'] : '';
+		$member_options['autofilled_editable'] = isset($_POST['autofilled_editable']) && !empty($_POST['autofilled_editable']) ? $_POST['autofilled_editable'] : '';
 		update_option('events_member_settings', $member_options);
 		echo '<div id="message" class="updated fade"><p><strong>' . __('Member settings saved.', 'event_espresso') . '</strong></p></div>';
 	}
