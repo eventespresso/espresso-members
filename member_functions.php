@@ -343,7 +343,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 //if (!function_exists('event_espresso_member_price_dropdown')) {
 
 function event_espresso_price_dropdown($event_id, $atts) {
-	do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, '');
+	do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, __LINE__);
 	//Attention:
 	//This is a copy of a core function. Any changes made here should be added to the core function of the same name
 	extract($atts);
@@ -384,10 +384,16 @@ function event_espresso_price_dropdown($event_id, $atts) {
 
 		foreach ($prices as $price) {
 
-			//Create the member price
-			$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
-			$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
-			do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, 'line 409');
+           if (is_user_logged_in()) {				
+ 				// member prices
+				$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
+				$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
+            } else {				
+ 				// NON-member prices
+				$member_price = $price->event_cost;
+				$member_price_type = $price->price_type;
+            }
+			
 			//Check for Early Registration discount
 			if ($early_price_data = early_discount_amount($event_id, $member_price)) {
 				$member_price = $early_price_data['event_price'];
