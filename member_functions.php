@@ -251,7 +251,7 @@ function event_espresso_member_only_pricing($event_id = 'NULL') {
 		?>
 		<p><input class="button" type="button" value="<?php _e('Add A Member Price', 'event_espresso'); ?>" onclick="addMemberPriceInput('dynamicMemberPriceInput');"></p>
 	</fieldset>
-	</td>
+	<!--</td> <<<---  REMOVED FROM member_functions.php line 254 becuase there was no opening td tag-->
 	<?php
 }
 
@@ -520,3 +520,32 @@ if (!function_exists('event_espresso_get_final_price')) {
 	}
 
 }
+
+
+
+
+function event_espresso_filter_orig_price_and_surcharge_sql_for_members( $SQL ) {
+	if (is_user_logged_in()) {
+		// id 	event_id 	price_type 	event_cost 	surcharge 	surcharge_type 	member_price_type 	member_price 	max_qty 	max_qty_members
+		$SQL = "SELECT id, member_price AS event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id=%d ORDER BY id ASC LIMIT 1";	
+	}
+	return $SQL;
+}
+add_filter( 'filter_hook_espresso_orig_price_and_surcharge_sql', 'event_espresso_filter_orig_price_and_surcharge_sql_for_members', 10, 1 );
+
+
+
+function event_espresso_filter_group_price_dropdown_sql_for_members( $SQL ) {
+	if (is_user_logged_in()) {
+		// id 	event_id 	price_type 	event_cost 	surcharge 	surcharge_type 	member_price_type 	member_price 	max_qty 	max_qty_members
+		$SQL = "SELECT ept.id, ept.member_price AS event_cost, ept.surcharge, ept.surcharge_type, ept.member_price_type AS price_type, edt.allow_multiple, edt.additional_limit ";
+		$SQL .= "FROM " . EVENTS_PRICES_TABLE . " ept ";
+		$SQL .= "JOIN " . EVENTS_DETAIL_TABLE . "  edt ON ept.event_id =  edt.id ";
+		$SQL .= "WHERE event_id=%d ORDER BY ept.id ASC";
+		// filter SQL statement
+	}
+	return $SQL;
+}
+add_filter( 'filter_hook_espresso_group_price_dropdown_sql', 'event_espresso_filter_group_price_dropdown_sql_for_members', 10, 1 );
+
+
