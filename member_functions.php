@@ -558,10 +558,50 @@ function event_espresso_member_edit_profile() {
 	// load some styles
 	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css');
 	/* Get user info. */
-	global $current_user, $wp_roles;
+	global $current_user, $wp_roles, $org_options;
 	get_currentuserinfo();
 
+	// themeroller stuff
+	if (!empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == 'Y') {
+
+		//Define the path to the ThemeRoller files
+		if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . "themeroller/index.php")) {
+			$themeroller_style_path = EVENT_ESPRESSO_UPLOAD_URL . 'themeroller/';
+		} else {
+			$themeroller_style_path = EVENT_ESPRESSO_PLUGINFULLURL . 'templates/css/themeroller/';
+		}
+
+		//Load custom style sheet if available
+		if (!empty($org_options['style_settings']['css_name'])) {
+			wp_register_style('espresso_custom_css', EVENT_ESPRESSO_UPLOAD_URL . 'css/' . $org_options['style_settings']['css_name']);
+			wp_enqueue_style('espresso_custom_css');
+		}
+
+		//Register the ThemeRoller styles
+		if (!empty($org_options['themeroller']) && !is_admin()) {
+
+			//Load the themeroller base style sheet
+			//If the themeroller-base.css is in the uploads folder, then we will use it instead of the one in the core
+			if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . $themeroller_style_path . 'themeroller-base.css')) {
+				wp_register_style('espresso_themeroller_base', $themeroller_style_path . 'themeroller-base.css');
+			} else {
+				wp_register_style('espresso_themeroller_base', EVENT_ESPRESSO_PLUGINFULLURL . 'templates/css/themeroller/themeroller-base.css');
+			}
+			wp_enqueue_style('espresso_themeroller_base');
+
+			//Load the smoothness style by default<br />
+			if (!isset($org_options['themeroller']['themeroller_style']) || empty($org_options['themeroller']['themeroller_style']) || $org_options['themeroller']['themeroller_style'] == 'N' ) {
+				$org_options['themeroller']['themeroller_style'] = 'smoothness';
+			}
+
+			//Load the selected themeroller style
+			wp_register_style('espresso_themeroller', $themeroller_style_path . $org_options['themeroller']['themeroller_style'] . '/style.css');
+			wp_enqueue_style('espresso_themeroller');
+		}
+	}
+
 	$error = false;
+	$updated = false;
 	// TODO add a front-end login form for logged-out users
 
 	/* If profile was saved, update profile. */
@@ -607,83 +647,89 @@ function event_espresso_member_edit_profile() {
 	} ?>
 	<!-- here's the form -->
 	<?php if ( !is_user_logged_in() ) : ?>
-		<p class="warning">
-			<?php _e('You must be logged in to edit your profile.', 'event_espresso'); ?>
-		</p><!-- .warning -->
+		<div class="warning">
+			<p><?php _e('You must be logged in to edit your profile.', 'event_espresso'); ?></p>
+		</div><!-- .warning -->
 	<?php else : ?>
-		<?php if ( $updated == true ) : ?> <p>Your profile has been updated</p> <?php endif; ?>
-		<?php if ( $error ) echo '<p class="error">' . $error . '</p>'; ?>
-			<form method="post" id="adduser" action="<?php the_permalink(); ?>">
+		<?php if ( $updated == true ) : ?> <div class="updated"><p><?php _e( 'Your profile has been updated', 'event_espresso' ); ?></p></div> <?php endif; ?>
+		<?php if ( $error ) echo '<div class="error"><p>' . $error . '</p></div>'; ?>
+			<form method="post" id="adduser" action="<?php the_permalink(); ?>" class="edit-profile ui-widget event-display-boxes">
 				<fieldset>
-					<h3><?php _e( 'Name', 'event_espresso' ); ?></h3>
-					<p class="form-username">
-						<label for="first-name"><?php _e('First Name', 'event_espresso'); ?></label>
-						<input class="text-input" name="first-name" type="text" id="first-name" value="<?php the_author_meta( 'user_firstname', $current_user->id ); ?>" />
-					</p><!-- .form-username -->
-					<p class="form-username">
-						<label for="last-name"><?php _e('Last Name', 'event_espresso'); ?></label>
-						<input class="text-input" name="last-name" type="text" id="last-name" value="<?php the_author_meta( 'user_lastname', $current_user->id ); ?>" />
-					</p><!-- .form-username -->
-					<p class="form-email">
-						<label for="email"><?php _e('E-mail *', 'event_espresso'); ?></label>
-						<input class="text-input" name="email" type="text" id="email" value="<?php the_author_meta( 'user_email', $current_user->id ); ?>" />
-					</p><!-- .form-email -->
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Name', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-username">
+							<label for="first-name"><?php _e('First Name', 'event_espresso'); ?></label>
+							<input class="text-input" name="first-name" type="text" id="first-name" value="<?php the_author_meta( 'user_firstname', $current_user->id ); ?>" />
+						</p><!-- .form-username -->
+						<p class="form-username">
+							<label for="last-name"><?php _e('Last Name', 'event_espresso'); ?></label>
+							<input class="text-input" name="last-name" type="text" id="last-name" value="<?php the_author_meta( 'user_lastname', $current_user->id ); ?>" />
+						</p><!-- .form-username -->
+						<p class="form-email">
+							<label for="email"><?php _e('E-mail *', 'event_espresso'); ?></label>
+							<input class="text-input" name="email" type="text" id="email" value="<?php the_author_meta( 'user_email', $current_user->id ); ?>" />
+						</p><!-- .form-email -->
+					</div>
 				</fieldset>
 				<fieldset>
-					<h3><?php _e( 'Contact Info', 'event_espresso' ); ?></h3>
-					<p class="form-address">
-						<label for="event_espresso_address"><?php _e( 'Address', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_address" type="text" id="event_espresso_address" value="<?php the_author_meta( 'event_espresso_address', $current_user->id ); ?>" />
-					</p>
-					<p class="form-address2">
-						<label for="event_espresso_address2"><?php _e( 'Address 2', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_address2" type="text" id="event_espresso_address2" value="<?php the_author_meta( 'event_espresso_address2', $current_user->id ); ?>" />
-					</p>
-					<p class="form-city">
-						<label for="event_espresso_city"><?php _e( 'City', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_city" type="text" id="event_espresso_city" value="<?php the_author_meta( 'event_espresso_city', $current_user->id ); ?>" />
-					</p>
-					<p class="form-state">
-						<label for="event_espresso_state"><?php _e( 'State', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_state" type="text" id="event_espresso_state" value="<?php the_author_meta( 'event_espresso_state', $current_user->id ); ?>" />
-					</p>
-					<p class="form-zip">
-						<label for="event_espresso_zip"><?php _e( 'Postal Code', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_zip" type="text" id="event_espresso_zip" value="<?php the_author_meta( 'event_espresso_zip', $current_user->id ); ?>" />
-                        	</p>
-					<p class="form-country">
-						<label for="event_espresso_country"><?php _e( 'Country', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_country" type="text" id="event_espresso_country" value="<?php the_author_meta( 'event_espresso_country', $current_user->id ); ?>" />
-                        	</p>
-					<p class="form-phone">
-						<label for="event_espresso_phone"><?php _e( 'Phone', 'event_espresso' ); ?></label>
-						<input class="text-input" name="event_espresso_phone" type="text" id="event_espresso_phone" value="<?php the_author_meta( 'event_espresso_phone', $current_user->id ); ?>" />
-                        	</p>
-					<p class="form-url">
-						<label for="url"><?php _e('Website', 'event_espresso'); ?></label>
-						<input class="text-input" name="url" type="text" id="url" value="<?php the_author_meta( 'user_url', $current_user->id ); ?>" />
-	                        </p><!-- .form-url -->
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Contact Info', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-address">
+							<label for="event_espresso_address"><?php _e( 'Address', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_address" type="text" id="event_espresso_address" value="<?php the_author_meta( 'event_espresso_address', $current_user->id ); ?>" />
+						</p>
+						<p class="form-address2">
+							<label for="event_espresso_address2"><?php _e( 'Address 2', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_address2" type="text" id="event_espresso_address2" value="<?php the_author_meta( 'event_espresso_address2', $current_user->id ); ?>" />
+						</p>
+						<p class="form-city">
+							<label for="event_espresso_city"><?php _e( 'City', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_city" type="text" id="event_espresso_city" value="<?php the_author_meta( 'event_espresso_city', $current_user->id ); ?>" />
+						</p>
+						<p class="form-state">
+							<label for="event_espresso_state"><?php _e( 'State', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_state" type="text" id="event_espresso_state" value="<?php the_author_meta( 'event_espresso_state', $current_user->id ); ?>" />
+						</p>
+						<p class="form-zip">
+							<label for="event_espresso_zip"><?php _e( 'Postal Code', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_zip" type="text" id="event_espresso_zip" value="<?php the_author_meta( 'event_espresso_zip', $current_user->id ); ?>" />
+	                        	</p>
+						<p class="form-country">
+							<label for="event_espresso_country"><?php _e( 'Country', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_country" type="text" id="event_espresso_country" value="<?php the_author_meta( 'event_espresso_country', $current_user->id ); ?>" />
+	                        	</p>
+						<p class="form-phone">
+							<label for="event_espresso_phone"><?php _e( 'Phone', 'event_espresso' ); ?></label>
+							<input class="text-input" name="event_espresso_phone" type="text" id="event_espresso_phone" value="<?php the_author_meta( 'event_espresso_phone', $current_user->id ); ?>" />
+	                        	</p>
+						<p class="form-url">
+							<label for="url"><?php _e('Website', 'event_espresso'); ?></label>
+							<input class="text-input" name="url" type="text" id="url" value="<?php the_author_meta( 'user_url', $current_user->id ); ?>" />
+						</p><!-- .form-url -->
+		            </div>
 				</fieldset>
 				<fieldset>
-					<h3><?php _e( 'Other Information', 'event_espresso' ); ?></h3>
-					<p class="form-password">
-						<label for="pass1"><?php _e('Password *', 'event_espresso'); ?> </label>
-						<input class="text-input" name="pass1" type="password" id="pass1" />
-					</p><!-- .form-password -->
-					<p class="form-password">
-						<label for="pass2"><?php _e('Repeat Password *', 'event_espresso'); ?></label>
-						<input class="text-input" name="pass2" type="password" id="pass2" />
-					</p><!-- .form-password -->
-					<p class="form-textarea">
-						<label for="description"><?php _e('Biographical Information', 'event_espresso') ?></label>
-						<textarea name="description" id="description" rows="3" cols="50"><?php the_author_meta( 'description', $current_user->id ); ?></textarea>
-					</p><!-- .form-textarea -->
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Other Information', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-password">
+							<label for="pass1"><?php _e('Password *', 'event_espresso'); ?> </label>
+							<input class="text-input" name="pass1" type="password" id="pass1" />
+						</p><!-- .form-password -->
+						<p class="form-password">
+							<label for="pass2"><?php _e('Repeat Password *', 'event_espresso'); ?></label>
+							<input class="text-input" name="pass2" type="password" id="pass2" />
+						</p><!-- .form-password -->
+						<p class="form-textarea">
+							<label for="description"><?php _e('Biographical Information', 'event_espresso') ?></label>
+							<textarea name="description" id="description" rows="3" cols="50"><?php the_author_meta( 'description', $current_user->id ); ?></textarea>
+						</p><!-- .form-textarea -->
+						<p class="form-submit">
+							<input name="updateuser" type="submit" id="updateuser" class="submit button ui-button ui-button-big ui-priority-primary ui-state-default ui-state-hover ui-state-focus ui-corner-all" value="<?php _e('Update', 'event_espresso'); ?>" />
+							<?php wp_nonce_field( 'update-user' ) ?>
+							<input name="action" type="hidden" id="action" value="update-user" />
+						</p><!-- .form-submit -->
+					</div>
 				</fieldset>
-				<p class="form-submit">
-					<input name="updateuser" type="submit" id="updateuser" class="submit button" value="<?php _e('Update', 'event_espresso'); ?>" />
-					<?php wp_nonce_field( 'update-user' ) ?>
-					<input name="action" type="hidden" id="action" value="update-user" />
-				</p><!-- .form-submit -->
 			</form><!-- #adduser -->
 	<?php endif;
 }
