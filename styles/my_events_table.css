@@ -172,31 +172,37 @@ th.sorting_desc span.sorting-indicator {
 	clear:both;
 	padding-top:20px;
 }
-div.updated,
-div.error,
-div.warning {
+
+/* edit profile page */
+form.edit-profile fieldset {
+	margin: 0 0 20px;
+}
+form.edit-profile input#updateuser {
+	font-size: 0.9em;
+	margin: 10px 0;
+}
+form.edit-profile label {
+	display: block;
+}
+div.notice {
 	padding: .3em .6em;
 	margin: 5px 0 15px;
 	display: block;
-	width: 100%;
-	border: 1px solid;
 	border-radius: 4px;
 }
-div.updated p,
-div.error p,
-div.warning p {
+div.notice p {
 	margin: auto;
 	font-size: 0.9em;
 }
 div.updated {
 	background-color: lightYellow;
-	border-color: #E6DB55;
+	border: 1px solid #E6DB55;
 }
 div.error {
 	background-color: #FFEBE8;
-	border-color: #C00;
+	border: 1px solid #C00;
 }
 div.warning {
 	background-color: #D9EDF7;
-	border-color: #3A87AD;
+	border: 1px solid #3A87AD;
 }
