@@ -552,7 +552,7 @@ add_filter( 'filter_hook_espresso_group_price_dropdown_sql', 'event_espresso_fil
  * Espresso Edit Profile
  * @author Chris Reynolds
  * @since 1.9.6
- * This adds a shortcode to display an edit profile form on the front end with Event Espresso profile fields added
+ * This runs the code for the shortcode to display an edit profile form on the front end with Event Espresso profile fields added
  */
 function event_espresso_member_edit_profile() {
 	/* Get user info. */
@@ -746,59 +746,19 @@ function event_espresso_member_edit_profile() {
 			</form><!-- #adduser -->
 	<?php endif;
 }
-add_shortcode( 'ESPRESSO_EDIT_PROFILE', 'event_espresso_member_edit_profile' );
+/**
+ * Espresso Edit Profile Display
+ * @uses event_espresso_member_edit_profile
+ * @author Chris Reynolds
+ * @since 1.9.6
+ * Spits event_espresso_member_edit_profile into an output buffer so it displays correctly in the_content. Used to create the shortcode to display an edit profile form on the front end with Event Espresso profile fields added
+ */
 
-function action_hook_espresso_member_edit_header( $current_user ) {
-	// load some styles
-	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css');
-	/* Get user info. */
-	global $current_user, $wp_roles;
-	get_currentuserinfo();
-
-	$error = '';
-	// TODO add a front-end login form for logged-out users
-
-	/* If profile was saved, update profile. */
-	if ( 'POST' == $_SERVER['REQUEST_METHOD'] && !empty( $_POST['action'] ) && $_POST['action'] == 'update-user' ) {
-
-	    /* Update user password. */
-	    if ( !empty($_POST['pass1'] ) && !empty( $_POST['pass2'] ) ) {
-	        if ( $_POST['pass1'] == $_POST['pass2'] )
-	            wp_update_user( array( 'ID' => $current_user->id, 'user_pass' => esc_attr( $_POST['pass1'] ) ) );
-	        else
-	            $error = __('The passwords you entered do not match.  Your password was not updated.', 'event_espresso');
-	    }
-
-	    /* Update user information. */
-	    if ( !empty( $_POST['url'] ) )
-	        update_usermeta( $current_user->id, 'user_url', esc_url( $_POST['url'] ) );
-	    if ( !empty( $_POST['email'] ) )
-	        update_usermeta( $current_user->id, 'user_email', esc_attr( $_POST['email'] ) );
-	    if ( !empty( $_POST['first-name'] ) )
-	        update_usermeta( $current_user->id, 'first_name', esc_attr( $_POST['first-name'] ) );
-	    if ( !empty( $_POST['last-name'] ) )
-	        update_usermeta($current_user->id, 'last_name', esc_attr( $_POST['last-name'] ) );
-	    if ( !empty( $_POST['description'] ) )
-	        update_usermeta( $current_user->id, 'description', esc_attr( $_POST['description'] ) );
-		if ( !empty ( $_POST['event_espresso_address'] ) )
-			update_user_meta($current_user->id, 'event_espresso_address', esc_attr( $_POST['event_espresso_address'] ) );
-		if ( !empty ( $_POST['event_espresso_address2'] ) )
-			update_user_meta($current_user->id, 'event_espresso_address2', esc_attr( $_POST['event_espresso_address2'] ) );
-		if ( !empty ( $_POST['event_espresso_city'] ) )
-			update_user_meta($current_user->id, 'event_espresso_city', esc_attr( $_POST['event_espresso_city'] ) );
-		if ( !empty ( $_POST['event_espresso_state'] ) )
-			update_user_meta($current_user->id, 'event_espresso_state', esc_attr( $_POST['event_espresso_state'] ) );
-		if ( !empty ( $_POST['event_espresso_zip'] ) )
-			update_user_meta($current_user->id, 'event_espresso_zip', esc_attr( $_POST['event_espresso_zip'] ) );
-		if ( !empty ( $_POST['event_espresso_country'] ) )
-			update_user_meta($current_user->id, 'event_espresso_country', esc_attr( $_POST['event_espresso_country'] ) );
-		if ( !empty ( $_POST['event_espresso_phone'] ) )
-			update_user_meta($current_user->id, 'event_espresso_phone', esc_attr( $_POST['event_espresso_phone'] ) );
-	    /* Redirect so the page will show updated info. */
-	    if ( !$error ) {
-	        wp_redirect( get_permalink() .'?updated=true' );
-	        exit;
-	    }
-	}
+function event_espresso_member_edit_profile_display() {
+	ob_start();
+	event_espresso_member_edit_profile();
+	$buffer = ob_get_contents();
+	ob_end_clean();
+	return $buffer;
 }
-add_action( 'event_espresso_member_edit_profile', 'action_hook_espresso_member_edit_header' );
+add_shortcode( 'ESPRESSO_EDIT_PROFILE', 'event_espresso_member_edit_profile_display' );
