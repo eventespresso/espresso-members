@@ -555,8 +555,6 @@ add_filter( 'filter_hook_espresso_group_price_dropdown_sql', 'event_espresso_fil
  * This adds a shortcode to display an edit profile form on the front end with Event Espresso profile fields added
  */
 function event_espresso_member_edit_profile() {
-	// load some styles
-	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css');
 	/* Get user info. */
 	global $current_user, $wp_roles, $org_options;
 	get_currentuserinfo();
@@ -599,6 +597,8 @@ function event_espresso_member_edit_profile() {
 			wp_enqueue_style('espresso_themeroller');
 		}
 	}
+	// load some styles
+	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css');
 
 	$error = false;
 	$updated = false;
@@ -644,30 +644,43 @@ function event_espresso_member_edit_profile() {
 	    if ( !$error ) {
 	    	$updated = true;
 	    }
-	} ?>
+	}
+	if ( (!empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == 'Y') || (espresso_version() >= '3.2.P' && !empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == true) ) { ?>
+		<script type="text/javascript">
+			$jaer = jQuery.noConflict();
+			jQuery(document).ready(function($jaer) {
+				$jaer('.warning').addClass('ui-state-highlight ui-corner-all');
+				$jaer('.updated').addClass('ui-state-highlight ui-corner-all');
+				$jaer('.error').addClass('ui-state-error ui-corner-all');
+				$jaer('.notice').removeClass('error');
+				$jaer('.notice').removeClass('updated');
+				$jaer('.notice').removeClass('warning');
+			});
+		</script>
+	<?php } ?>
 	<!-- here's the form -->
 	<?php if ( !is_user_logged_in() ) : ?>
-		<div class="warning">
+		<div class="notice warning">
 			<p><?php _e('You must be logged in to edit your profile.', 'event_espresso'); ?></p>
 		</div><!-- .warning -->
 	<?php else : ?>
-		<?php if ( $updated == true ) : ?> <div class="updated"><p><?php _e( 'Your profile has been updated', 'event_espresso' ); ?></p></div> <?php endif; ?>
-		<?php if ( $error ) echo '<div class="error"><p>' . $error . '</p></div>'; ?>
+		<?php if ( $updated == true ) : ?> <div class="notice updated"><p><?php _e( 'Your profile has been updated', 'event_espresso' ); ?></p></div> <?php endif; ?>
+		<?php if ( $error ) echo '<div class="notice error"><p>' . $error . '</p></div>'; ?>
 			<form method="post" id="adduser" action="<?php the_permalink(); ?>" class="edit-profile ui-widget event-display-boxes">
 				<fieldset>
 					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Name', 'event_espresso' ); ?></h3>
 					<div class="event-data-display ui-widget-content ui-corner-bottom">
 						<p class="form-username">
 							<label for="first-name"><?php _e('First Name', 'event_espresso'); ?></label>
-							<input class="text-input" name="first-name" type="text" id="first-name" value="<?php the_author_meta( 'user_firstname', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="first-name" type="text" id="first-name" value="<?php the_author_meta( 'user_firstname', $current_user->id ); ?>" />
 						</p><!-- .form-username -->
 						<p class="form-username">
 							<label for="last-name"><?php _e('Last Name', 'event_espresso'); ?></label>
-							<input class="text-input" name="last-name" type="text" id="last-name" value="<?php the_author_meta( 'user_lastname', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="last-name" type="text" id="last-name" value="<?php the_author_meta( 'user_lastname', $current_user->id ); ?>" />
 						</p><!-- .form-username -->
 						<p class="form-email">
 							<label for="email"><?php _e('E-mail *', 'event_espresso'); ?></label>
-							<input class="text-input" name="email" type="text" id="email" value="<?php the_author_meta( 'user_email', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="email" type="text" id="email" value="<?php the_author_meta( 'user_email', $current_user->id ); ?>" />
 						</p><!-- .form-email -->
 					</div>
 				</fieldset>
@@ -676,35 +689,35 @@ function event_espresso_member_edit_profile() {
 					<div class="event-data-display ui-widget-content ui-corner-bottom">
 						<p class="form-address">
 							<label for="event_espresso_address"><?php _e( 'Address', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_address" type="text" id="event_espresso_address" value="<?php the_author_meta( 'event_espresso_address', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_address" type="text" id="event_espresso_address" value="<?php the_author_meta( 'event_espresso_address', $current_user->id ); ?>" />
 						</p>
 						<p class="form-address2">
 							<label for="event_espresso_address2"><?php _e( 'Address 2', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_address2" type="text" id="event_espresso_address2" value="<?php the_author_meta( 'event_espresso_address2', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_address2" type="text" id="event_espresso_address2" value="<?php the_author_meta( 'event_espresso_address2', $current_user->id ); ?>" />
 						</p>
 						<p class="form-city">
 							<label for="event_espresso_city"><?php _e( 'City', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_city" type="text" id="event_espresso_city" value="<?php the_author_meta( 'event_espresso_city', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_city" type="text" id="event_espresso_city" value="<?php the_author_meta( 'event_espresso_city', $current_user->id ); ?>" />
 						</p>
 						<p class="form-state">
 							<label for="event_espresso_state"><?php _e( 'State', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_state" type="text" id="event_espresso_state" value="<?php the_author_meta( 'event_espresso_state', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_state" type="text" id="event_espresso_state" value="<?php the_author_meta( 'event_espresso_state', $current_user->id ); ?>" />
 						</p>
 						<p class="form-zip">
 							<label for="event_espresso_zip"><?php _e( 'Postal Code', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_zip" type="text" id="event_espresso_zip" value="<?php the_author_meta( 'event_espresso_zip', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_zip" type="text" id="event_espresso_zip" value="<?php the_author_meta( 'event_espresso_zip', $current_user->id ); ?>" />
 	                        	</p>
 						<p class="form-country">
 							<label for="event_espresso_country"><?php _e( 'Country', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_country" type="text" id="event_espresso_country" value="<?php the_author_meta( 'event_espresso_country', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_country" type="text" id="event_espresso_country" value="<?php the_author_meta( 'event_espresso_country', $current_user->id ); ?>" />
 	                        	</p>
 						<p class="form-phone">
 							<label for="event_espresso_phone"><?php _e( 'Phone', 'event_espresso' ); ?></label>
-							<input class="text-input" name="event_espresso_phone" type="text" id="event_espresso_phone" value="<?php the_author_meta( 'event_espresso_phone', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="event_espresso_phone" type="text" id="event_espresso_phone" value="<?php the_author_meta( 'event_espresso_phone', $current_user->id ); ?>" />
 	                        	</p>
 						<p class="form-url">
 							<label for="url"><?php _e('Website', 'event_espresso'); ?></label>
-							<input class="text-input" name="url" type="text" id="url" value="<?php the_author_meta( 'user_url', $current_user->id ); ?>" />
+							<input class="text-input ui-input" name="url" type="text" id="url" value="<?php the_author_meta( 'user_url', $current_user->id ); ?>" />
 						</p><!-- .form-url -->
 		            </div>
 				</fieldset>
@@ -713,15 +726,15 @@ function event_espresso_member_edit_profile() {
 					<div class="event-data-display ui-widget-content ui-corner-bottom">
 						<p class="form-password">
 							<label for="pass1"><?php _e('Password *', 'event_espresso'); ?> </label>
-							<input class="text-input" name="pass1" type="password" id="pass1" />
+							<input class="text-input ui-input" name="pass1" type="password" id="pass1" />
 						</p><!-- .form-password -->
 						<p class="form-password">
 							<label for="pass2"><?php _e('Repeat Password *', 'event_espresso'); ?></label>
-							<input class="text-input" name="pass2" type="password" id="pass2" />
+							<input class="text-input ui-input" name="pass2" type="password" id="pass2" />
 						</p><!-- .form-password -->
 						<p class="form-textarea">
 							<label for="description"><?php _e('Biographical Information', 'event_espresso') ?></label>
-							<textarea name="description" id="description" rows="3" cols="50"><?php the_author_meta( 'description', $current_user->id ); ?></textarea>
+							<textarea name="description" class="ui-input" id="description" rows="3" cols="50"><?php the_author_meta( 'description', $current_user->id ); ?></textarea>
 						</p><!-- .form-textarea -->
 						<p class="form-submit">
 							<input name="updateuser" type="submit" id="updateuser" class="submit button ui-button ui-button-big ui-priority-primary ui-state-default ui-state-hover ui-state-focus ui-corner-all" value="<?php _e('Update', 'event_espresso'); ?>" />
