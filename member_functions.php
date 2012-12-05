@@ -629,7 +629,7 @@ function event_espresso_member_edit_profile() {
 	    	}
 	    }
 	    if ( !empty( $_POST['email'] ) )
-	        update_user_meta( $current_user->id, 'user_email', esc_attr( $_POST['email'] ) );
+	    	wp_update_user( array( 'ID' => $current_user->id, 'user_email' => sanitize_email( $_POST['email'] ) ) );
 	    if ( !empty( $_POST['first-name'] ) )
 	        update_user_meta( $current_user->id, 'first_name', esc_attr( $_POST['first-name'] ) );
 	    if ( !empty( $_POST['last-name'] ) )
