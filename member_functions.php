@@ -610,7 +610,7 @@ function event_espresso_member_edit_profile() {
 	    /* Update user password. */
 	    if ( !empty($_POST['pass1'] ) && !empty( $_POST['pass2'] ) ) {
 	        if ( $_POST['pass1'] == $_POST['pass2'] )
-	            wp_update_user( array( 'ID' => $current_user->id, 'user_pass' => sanitize_text_field($_POST['pass1']) ) );
+	            wp_update_user( array( 'ID' => $current_user->ID, 'user_pass' => sanitize_text_field($_POST['pass1']) ) );
 	        else
 	            $error = __('The passwords you entered do not match.  Your password was not updated.', 'event_espresso');
 	    }
@@ -622,10 +622,9 @@ function event_espresso_member_edit_profile() {
 	    		$url_is_valid = false;
 	    	}
 	    	if ( $url_is_valid ) {
-	    		wp_update_user( array( 'ID' => $current_user->id, 'user_url' => esc_url( $_POST['url'] ) ));
+	    		wp_update_user( array( 'ID' => $current_user->ID, 'user_url' => esc_url( $_POST['url'] ) ));
 	    	} else {
 	    		$error = __('The URL you entered does not appear to be valid. Please enter a valid URL.', 'event_espresso');
-	    		//update_user_meta( $current_user->id, 'user_url', esc_url( $_POST['url'] ) );
 	    	}
 	    }
 	    if ( !empty( $_POST['email'] ) )
