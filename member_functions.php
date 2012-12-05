@@ -605,12 +605,12 @@ function event_espresso_member_edit_profile() {
 	// TODO add a front-end login form for logged-out users
 
 	/* If profile was saved, update profile. */
-	if ( 'POST' == $_SERVER['REQUEST_METHOD'] && !empty( $_POST['action'] ) && $_POST['action'] == 'update-user' ) {
+	if ( 'POST' == $_SERVER['REQUEST_METHOD'] && !empty( $_POST['action'] ) && $_POST['action'] == 'update-user' && is_user_logged_in() ) {
 
 	    /* Update user password. */
 	    if ( !empty($_POST['pass1'] ) && !empty( $_POST['pass2'] ) ) {
 	        if ( $_POST['pass1'] == $_POST['pass2'] )
-	            wp_update_user( array( 'ID' => $current_user->id, 'user_pass' => esc_attr( $_POST['pass1'] ) ) );
+	            wp_update_user( array( 'ID' => $current_user->id, 'user_pass' => sanitize_text_field($_POST['pass1']) ) );
 	        else
 	            $error = __('The passwords you entered do not match.  Your password was not updated.', 'event_espresso');
 	    }
@@ -673,6 +673,10 @@ function event_espresso_member_edit_profile() {
 		<div class="notice warning">
 			<p><?php _e('You must be logged in to edit your profile.', 'event_espresso'); ?></p>
 		</div><!-- .warning -->
+		<?php
+			$args = array( 'redirect' => home_url() );
+			wp_login_form($args);
+		?>
 	<?php else : ?>
 		<?php if ( $updated == true ) : ?> <div class="notice updated"><p><?php _e( 'Your profile has been updated', 'event_espresso' ); ?></p></div> <?php endif; ?>
 		<?php if ( $error ) echo '<div class="notice error"><p>' . $error . '</p></div>'; ?>
@@ -694,7 +698,7 @@ function event_espresso_member_edit_profile() {
 						</p><!-- .form-email -->
 					</div>
 				</fieldset>
-				<fieldset><?php var_dump(the_author_meta()); ?>
+				<fieldset>
 					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Contact Info', 'event_espresso' ); ?></h3>
 					<div class="event-data-display ui-widget-content ui-corner-bottom">
 						<p class="form-address">
