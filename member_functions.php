@@ -614,16 +614,26 @@ function event_espresso_member_edit_profile() {
 	        else
 	            $error = __('The passwords you entered do not match.  Your password was not updated.', 'event_espresso');
 	    }
-
 	    /* Update user information. */
-	    if ( !empty( $_POST['url'] ) )
-	        update_usermeta( $current_user->id, 'user_url', esc_url( $_POST['url'] ) );
+	    if ( !empty( $_POST['url'] ) ) {
+	    	if ( strpos($_POST['url'], 'ttp://') ) {
+	    		$url_is_valid = true;
+	    	} else {
+	    		$url_is_valid = false;
+	    	}
+	    	if ( $url_is_valid ) {
+	    		wp_update_user( array( 'ID' => $current_user->id, 'user_url' => esc_url( $_POST['url'] ) ));
+	    	} else {
+	    		$error = __('The URL you entered does not appear to be valid. Please enter a valid URL.', 'event_espresso');
+	    		//update_user_meta( $current_user->id, 'user_url', esc_url( $_POST['url'] ) );
+	    	}
+	    }
 	    if ( !empty( $_POST['email'] ) )
-	        update_usermeta( $current_user->id, 'user_email', esc_attr( $_POST['email'] ) );
+	        update_user_meta( $current_user->id, 'user_email', esc_attr( $_POST['email'] ) );
 	    if ( !empty( $_POST['first-name'] ) )
-	        update_usermeta( $current_user->id, 'first_name', esc_attr( $_POST['first-name'] ) );
+	        update_user_meta( $current_user->id, 'first_name', esc_attr( $_POST['first-name'] ) );
 	    if ( !empty( $_POST['last-name'] ) )
-	        update_usermeta($current_user->id, 'last_name', esc_attr( $_POST['last-name'] ) );
+	        update_user_meta($current_user->id, 'last_name', esc_attr( $_POST['last-name'] ) );
 	    if ( !empty( $_POST['description'] ) )
 	        update_usermeta( $current_user->id, 'description', esc_attr( $_POST['description'] ) );
 		if ( !empty ( $_POST['event_espresso_address'] ) )
@@ -684,7 +694,7 @@ function event_espresso_member_edit_profile() {
 						</p><!-- .form-email -->
 					</div>
 				</fieldset>
-				<fieldset>
+				<fieldset><?php var_dump(the_author_meta()); ?>
 					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Contact Info', 'event_espresso' ); ?></h3>
 					<div class="event-data-display ui-widget-content ui-corner-bottom">
 						<p class="form-address">
