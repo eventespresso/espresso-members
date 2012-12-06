@@ -384,16 +384,16 @@ function event_espresso_price_dropdown($event_id, $atts) {
 
 		foreach ($prices as $price) {
 
-           if (is_user_logged_in()) {				
+           if (is_user_logged_in()) {
  				// member prices
 				$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
 				$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
-            } else {				
+            } else {
  				// NON-member prices
 				$member_price = $price->event_cost;
 				$member_price_type = $price->price_type;
             }
-			
+
 			//Check for Early Registration discount
 			if ($early_price_data = early_discount_amount($event_id, $member_price)) {
 				$member_price = $early_price_data['event_price'];
@@ -457,7 +457,7 @@ function event_espresso_price_dropdown($event_id, $atts) {
 			  }
 	    }
     }
-    
+
 	return $html;
 }
 
@@ -527,7 +527,7 @@ if (!function_exists('event_espresso_get_final_price')) {
 function event_espresso_filter_orig_price_and_surcharge_sql_for_members( $SQL ) {
 	if (is_user_logged_in()) {
 		// id 	event_id 	price_type 	event_cost 	surcharge 	surcharge_type 	member_price_type 	member_price 	max_qty 	max_qty_members
-		$SQL = "SELECT id, member_price AS event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id=%d ORDER BY id ASC LIMIT 1";	
+		$SQL = "SELECT id, member_price AS event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id=%d ORDER BY id ASC LIMIT 1";
 	}
 	return $SQL;
 }
@@ -548,4 +548,230 @@ function event_espresso_filter_group_price_dropdown_sql_for_members( $SQL ) {
 }
 add_filter( 'filter_hook_espresso_group_price_dropdown_sql', 'event_espresso_filter_group_price_dropdown_sql_for_members', 10, 1 );
 
+/**
+ * Espresso Edit Profile
+ * @author Chris Reynolds
+ * @since 1.9.6
+ * This runs the code for the shortcode to display an edit profile form on the front end with Event Espresso profile fields added
+ */
+function event_espresso_member_edit_profile() {
+	/* Get user info. */
+	global $current_user, $wp_roles, $org_options;
+	get_currentuserinfo();
 
+	// themeroller stuff
+	if (!empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == 'Y') {
+
+		//Define the path to the ThemeRoller files
+		if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . "themeroller/index.php")) {
+			$themeroller_style_path = EVENT_ESPRESSO_UPLOAD_URL . 'themeroller/';
+		} else {
+			$themeroller_style_path = EVENT_ESPRESSO_PLUGINFULLURL . 'templates/css/themeroller/';
+		}
+
+		//Load custom style sheet if available
+		if (!empty($org_options['style_settings']['css_name'])) {
+			wp_register_style('espresso_custom_css', EVENT_ESPRESSO_UPLOAD_URL . 'css/' . $org_options['style_settings']['css_name']);
+			wp_enqueue_style('espresso_custom_css');
+		}
+
+		//Register the ThemeRoller styles
+		if (!empty($org_options['themeroller']) && !is_admin()) {
+
+			//Load the themeroller base style sheet
+			//If the themeroller-base.css is in the uploads folder, then we will use it instead of the one in the core
+			if (file_exists(EVENT_ESPRESSO_UPLOAD_DIR . $themeroller_style_path . 'themeroller-base.css')) {
+				wp_register_style('espresso_themeroller_base', $themeroller_style_path . 'themeroller-base.css');
+			} else {
+				wp_register_style('espresso_themeroller_base', EVENT_ESPRESSO_PLUGINFULLURL . 'templates/css/themeroller/themeroller-base.css');
+			}
+			wp_enqueue_style('espresso_themeroller_base');
+
+			//Load the smoothness style by default<br />
+			if (!isset($org_options['themeroller']['themeroller_style']) || empty($org_options['themeroller']['themeroller_style']) || $org_options['themeroller']['themeroller_style'] == 'N' ) {
+				$org_options['themeroller']['themeroller_style'] = 'smoothness';
+			}
+
+			//Load the selected themeroller style
+			wp_register_style('espresso_themeroller', $themeroller_style_path . $org_options['themeroller']['themeroller_style'] . '/style.css');
+			wp_enqueue_style('espresso_themeroller');
+		}
+	}
+	// load some styles
+	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css');
+
+	$error = false;
+	$updated = false;
+	// TODO add a front-end login form for logged-out users
+
+	/* If profile was saved, update profile. */
+	if ( 'POST' == $_SERVER['REQUEST_METHOD'] && !empty( $_POST['action'] ) && $_POST['action'] == 'update-user' && is_user_logged_in() ) {
+
+	    /* Update user password. */
+	    if ( !empty($_POST['pass1'] ) && !empty( $_POST['pass2'] ) ) {
+	        if ( $_POST['pass1'] == $_POST['pass2'] )
+	            wp_update_user( array( 'ID' => $current_user->ID, 'user_pass' => sanitize_text_field($_POST['pass1']) ) );
+	        else
+	            $error = __('The passwords you entered do not match.  Your password was not updated.', 'event_espresso');
+	    }
+	    /* Update user information. */
+	    if ( !empty( $_POST['url'] ) ) {
+	    	if ( strpos($_POST['url'], 'ttp://') ) {
+	    		$url_is_valid = true;
+	    	} else {
+	    		$url_is_valid = false;
+	    	}
+	    	if ( $url_is_valid ) {
+	    		wp_update_user( array( 'ID' => $current_user->ID, 'user_url' => esc_url( $_POST['url'] ) ));
+	    	} else {
+	    		$error = __('The URL you entered does not appear to be valid. Please enter a valid URL.', 'event_espresso');
+	    	}
+	    }
+	    if ( !empty( $_POST['email'] ) )
+	    	wp_update_user( array( 'ID' => $current_user->ID, 'user_email' => sanitize_email( $_POST['email'] ) ) );
+	    if ( !empty( $_POST['first-name'] ) )
+	        update_user_meta( $current_user->ID, 'first_name', esc_attr( $_POST['first-name'] ) );
+	    if ( !empty( $_POST['last-name'] ) )
+	        update_user_meta($current_user->ID, 'last_name', esc_attr( $_POST['last-name'] ) );
+	    if ( !empty( $_POST['description'] ) )
+	        update_usermeta( $current_user->ID, 'description', esc_attr( $_POST['description'] ) );
+		if ( !empty ( $_POST['event_espresso_address'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_address', esc_attr( $_POST['event_espresso_address'] ) );
+		if ( !empty ( $_POST['event_espresso_address2'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_address2', esc_attr( $_POST['event_espresso_address2'] ) );
+		if ( !empty ( $_POST['event_espresso_city'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_city', esc_attr( $_POST['event_espresso_city'] ) );
+		if ( !empty ( $_POST['event_espresso_state'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_state', esc_attr( $_POST['event_espresso_state'] ) );
+		if ( !empty ( $_POST['event_espresso_zip'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_zip', esc_attr( $_POST['event_espresso_zip'] ) );
+		if ( !empty ( $_POST['event_espresso_country'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_country', esc_attr( $_POST['event_espresso_country'] ) );
+		if ( !empty ( $_POST['event_espresso_phone'] ) )
+			update_user_meta($current_user->ID, 'event_espresso_phone', esc_attr( $_POST['event_espresso_phone'] ) );
+	    /* Redirect so the page will show updated info. */
+	    if ( !$error ) {
+	    	$updated = true;
+	    }
+	}
+	if ( (!empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == 'Y') || (espresso_version() >= '3.2.P' && !empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == true) ) { ?>
+		<script type="text/javascript">
+			$jaer = jQuery.noConflict();
+			jQuery(document).ready(function($jaer) {
+				$jaer('.warning').addClass('ui-state-highlight ui-corner-all');
+				$jaer('.updated').addClass('ui-state-highlight ui-corner-all');
+				$jaer('.error').addClass('ui-state-error ui-corner-all');
+				$jaer('.notice').removeClass('error');
+				$jaer('.notice').removeClass('updated');
+				$jaer('.notice').removeClass('warning');
+			});
+		</script>
+	<?php } ?>
+	<!-- here's the form -->
+	<?php if ( !is_user_logged_in() ) : ?>
+		<div class="notice warning">
+			<p><?php _e('You must be logged in to edit your profile.', 'event_espresso'); ?></p>
+		</div><!-- .warning -->
+		<?php
+			$args = array( 'redirect' => home_url() );
+			wp_login_form($args);
+		?>
+	<?php else : ?>
+		<?php if ( $updated == true ) : ?> <div class="notice updated"><p><?php _e( 'Your profile has been updated', 'event_espresso' ); ?></p></div> <?php endif; ?>
+		<?php if ( $error ) echo '<div class="notice error"><p>' . $error . '</p></div>'; ?>
+			<form method="post" id="adduser" action="<?php the_permalink(); ?>" class="edit-profile ui-widget event-display-boxes">
+				<fieldset>
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Name', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-username">
+							<label for="first-name"><?php _e('First Name', 'event_espresso'); ?></label>
+							<input class="text-input ui-input" name="first-name" type="text" id="first-name" value="<?php the_author_meta( 'user_firstname', $current_user->ID ); ?>" />
+						</p><!-- .form-username -->
+						<p class="form-username">
+							<label for="last-name"><?php _e('Last Name', 'event_espresso'); ?></label>
+							<input class="text-input ui-input" name="last-name" type="text" id="last-name" value="<?php the_author_meta( 'user_lastname', $current_user->ID ); ?>" />
+						</p><!-- .form-username -->
+						<p class="form-email">
+							<label for="email"><?php _e('E-mail *', 'event_espresso'); ?></label>
+							<input class="text-input ui-input" name="email" type="text" id="email" value="<?php the_author_meta( 'user_email', $current_user->ID ); ?>" />
+						</p><!-- .form-email -->
+					</div>
+				</fieldset>
+				<fieldset>
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Contact Info', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-address">
+							<label for="event_espresso_address"><?php _e( 'Address', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_address" type="text" id="event_espresso_address" value="<?php the_author_meta( 'event_espresso_address', $current_user->ID ); ?>" />
+						</p>
+						<p class="form-address2">
+							<label for="event_espresso_address2"><?php _e( 'Address 2', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_address2" type="text" id="event_espresso_address2" value="<?php the_author_meta( 'event_espresso_address2', $current_user->ID ); ?>" />
+						</p>
+						<p class="form-city">
+							<label for="event_espresso_city"><?php _e( 'City', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_city" type="text" id="event_espresso_city" value="<?php the_author_meta( 'event_espresso_city', $current_user->ID ); ?>" />
+						</p>
+						<p class="form-state">
+							<label for="event_espresso_state"><?php _e( 'State', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_state" type="text" id="event_espresso_state" value="<?php the_author_meta( 'event_espresso_state', $current_user->ID ); ?>" />
+						</p>
+						<p class="form-zip">
+							<label for="event_espresso_zip"><?php _e( 'Postal Code', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_zip" type="text" id="event_espresso_zip" value="<?php the_author_meta( 'event_espresso_zip', $current_user->ID ); ?>" />
+	                        	</p>
+						<p class="form-country">
+							<label for="event_espresso_country"><?php _e( 'Country', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_country" type="text" id="event_espresso_country" value="<?php the_author_meta( 'event_espresso_country', $current_user->ID ); ?>" />
+	                        	</p>
+						<p class="form-phone">
+							<label for="event_espresso_phone"><?php _e( 'Phone', 'event_espresso' ); ?></label>
+							<input class="text-input ui-input" name="event_espresso_phone" type="text" id="event_espresso_phone" value="<?php the_author_meta( 'event_espresso_phone', $current_user->ID ); ?>" />
+	                        	</p>
+						<p class="form-url">
+							<label for="url"><?php _e('Website', 'event_espresso'); ?></label>
+							<input class="text-input ui-input" name="url" type="text" id="url" value="<?php the_author_meta( 'user_url', $current_user->ID ); ?>" />
+						</p><!-- .form-url -->
+		            </div>
+				</fieldset>
+				<fieldset>
+					<h3 class="ui-widget-header ui-corner-top"><?php _e( 'Other Information', 'event_espresso' ); ?></h3>
+					<div class="event-data-display ui-widget-content ui-corner-bottom">
+						<p class="form-password">
+							<label for="pass1"><?php _e('Password *', 'event_espresso'); ?> </label>
+							<input class="text-input ui-input" name="pass1" type="password" id="pass1" />
+						</p><!-- .form-password -->
+						<p class="form-password">
+							<label for="pass2"><?php _e('Repeat Password *', 'event_espresso'); ?></label>
+							<input class="text-input ui-input" name="pass2" type="password" id="pass2" />
+						</p><!-- .form-password -->
+						<p class="form-textarea">
+							<label for="description"><?php _e('Biographical Information', 'event_espresso') ?></label>
+							<textarea name="description" class="ui-input" id="description" rows="3" cols="50"><?php the_author_meta( 'description', $current_user->ID ); ?></textarea>
+						</p><!-- .form-textarea -->
+						<p class="form-submit">
+							<input name="updateuser" type="submit" id="updateuser" class="submit button ui-button ui-button-big ui-priority-primary ui-state-default ui-state-hover ui-state-focus ui-corner-all" value="<?php _e('Update', 'event_espresso'); ?>" />
+							<?php wp_nonce_field( 'update-user' ) ?>
+							<input name="action" type="hidden" id="action" value="update-user" />
+						</p><!-- .form-submit -->
+					</div>
+				</fieldset>
+			</form><!-- #adduser -->
+	<?php endif;
+}
+/**
+ * Espresso Edit Profile Display
+ * @uses event_espresso_member_edit_profile
+ * @author Chris Reynolds
+ * @since 1.9.6
+ * Spits event_espresso_member_edit_profile into an output buffer so it displays correctly in the_content. Used to create the shortcode to display an edit profile form on the front end with Event Espresso profile fields added
+ */
+
+function event_espresso_member_edit_profile_display() {
+	ob_start();
+	event_espresso_member_edit_profile();
+	$buffer = ob_get_contents();
+	ob_end_clean();
+	return $buffer;
+}
+add_shortcode( 'ESPRESSO_EDIT_PROFILE', 'event_espresso_member_edit_profile_display' );
