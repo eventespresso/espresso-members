@@ -192,7 +192,7 @@ function event_espresso_add_user_to_event($event_id, $userid, $attendee_id) {
 	global $bp;
 	$user_role = event_espresso_get_current_user_role();
 	$sql = "INSERT INTO " . EVENTS_MEMBER_REL_TABLE . "(event_id, user_id, attendee_id, user_role) VALUES ('" . $event_id . "', '" . $userid . "', '" . $attendee_id . "', '" . $user_role . "')";
-	$wpdb->query($wpdb->prepare($sql));
+	$wpdb->query( $sql );
 
 }
 
