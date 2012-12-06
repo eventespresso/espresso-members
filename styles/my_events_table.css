@@ -172,3 +172,37 @@ th.sorting_desc span.sorting-indicator {
 	clear:both;
 	padding-top:20px;
 }
+
+/* edit profile page */
+form.edit-profile fieldset {
+	margin: 0 0 20px;
+}
+form.edit-profile input#updateuser {
+	font-size: 0.9em;
+	margin: 10px 0;
+}
+form.edit-profile label {
+	display: block;
+}
+div.notice {
+	padding: .3em .6em;
+	margin: 5px 0 15px;
+	display: block;
+	border-radius: 4px;
+}
+div.notice p {
+	margin: auto;
+	font-size: 0.9em;
+}
+div.updated {
+	background-color: lightYellow;
+	border: 1px solid #E6DB55;
+}
+div.error {
+	background-color: #FFEBE8;
+	border: 1px solid #C00;
+}
+div.warning {
+	background-color: #D9EDF7;
+	border: 1px solid #3A87AD;
+}
