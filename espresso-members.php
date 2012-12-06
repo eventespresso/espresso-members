@@ -3,8 +3,7 @@
 Plugin Name: Event Espresso - Members Addon
 Plugin URI: http://eventespresso.com/
 Description: Member integration addon for Event Espresso. <a href="admin.php?page=support">Support</a>
-
-Version: 1.9.5.1
+Version: 1.9.6
 
 Author: Event Espresso
 Author URI: http://www.eventespresso.com
@@ -27,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 function espresso_members_version() {
-	return '1.9.5.1';
+	return '1.9.6';
 }
 
 //Update notifications
