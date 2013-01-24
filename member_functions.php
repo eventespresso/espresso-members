@@ -462,6 +462,55 @@ function event_espresso_price_dropdown($event_id, $atts) {
 }
 
 
+function espresso_attendee_admin_price_dropdown_member($event_id, $atts) {
+	extract($atts);
+	global $wpdb, $org_options, $espresso_premium;
+
+	if ($espresso_premium != true)
+		return;
+		
+	$html = '';
+	$label = isset($label) && $label != '' ? $label : '<span class="section-title">'.__('Choose an Option: ', 'event_espresso').'</span>';
+	
+	$sql = "SELECT id, event_cost, surcharge, surcharge_type, member_price, member_price_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
+	//echo $sql;
+	$prices = $wpdb->get_results($sql);
+	//echo "<pre>".print_r($prices,true)."</pre>";
+	
+	//If more than one price was added to an event, we need to create a drop down to select the price.
+	if ($wpdb->num_rows > 1) {
+		
+		//Create the label for the drop down
+		$html .= $show_label == 1 ? '<label for="event_cost">' . $label . '</label>' : '';
+
+		//Create a dropdown of prices
+		$html .= '<select name="price_option" id="price_option-' . $event_id . '">';
+
+		foreach ($prices as $price) {
+			
+ 			// member prices
+			$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
+			$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
+			//echo $member_price;
+            
+			//Using price ID
+			//If the price id was passed to this function, we need need to select that price.
+			$selected = isset($current_value) && $current_value == $result->id ? ' selected="selected" ' : '';
+			
+			//Create the drop down options
+			$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '')  . ') </option>';
+			
+		}
+		
+		//Create a hidden field so that we know the price dropdown was used
+		$html .= '</select><input type="hidden" name="price_select" id="price_select-' . $event_id . '" value="true">';
+		
+	}
+	//echo 'ts';
+	echo $html;
+}
+add_action('action_hook_espresso_attendee_admin_price_dropdown_member', 'espresso_attendee_admin_price_dropdown_member', 10, 2);
+
 
 if (!function_exists('espresso_member_price_select_action')) {
 
