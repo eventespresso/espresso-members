@@ -451,10 +451,10 @@ function event_espresso_price_dropdown($event_id, $atts) {
 			  //Create hidden fields to pass additional information to the add_attendees_to_db function
 			  $html .= '<input type="hidden" name="price_id" id="price_id-' . $event_id . '" value="' . $price->id . '">';
 			  $html .= '<input type="hidden" name="event_cost' . $multi_name_adjust . '" id="event_cost-' . $price->id . '" value="' . number_format($price->event_cost, 2, '.', '') . '">';
-			  } else {
+			} else {
 			  $html .= '<span class="free_event">' . __('Free Event', 'event_espresso') . '</span>';
 			  $html .= '<input type="hidden" name="payment' . $multi_name_adjust . '" id="payment-' . $event_id . '" value="' . __('free event', 'event_espresso') . '">';
-			  }
+			}
 	    }
     }
 
@@ -484,7 +484,7 @@ function espresso_attendee_admin_price_dropdown_member($event_id, $atts) {
 		$html .= $show_label == 1 ? '<label for="event_cost">' . $label . '</label>' : '';
 
 		//Create a dropdown of prices
-		$html .= '<select name="price_option" id="price_option-' . $event_id . '">';
+		$html .= '<select name="members_price_option" id="members_price_option-' . $event_id . '">';
 
 		foreach ($prices as $price) {
 			
@@ -492,10 +492,12 @@ function espresso_attendee_admin_price_dropdown_member($event_id, $atts) {
 			$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
 			$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
 			//echo $member_price;
+			//echo $member_price_type;
+			//echo $current_value;
             
 			//Using price ID
 			//If the price id was passed to this function, we need need to select that price.
-			$selected = isset($current_value) && $current_value == $result->id ? ' selected="selected" ' : '';
+			$selected = isset($current_value) && $current_value == $member_price_type ? ' selected="selected" ' : '';
 			
 			//Create the drop down options
 			$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '')  . ') </option>';
@@ -503,7 +505,7 @@ function espresso_attendee_admin_price_dropdown_member($event_id, $atts) {
 		}
 		
 		//Create a hidden field so that we know the price dropdown was used
-		$html .= '</select><input type="hidden" name="price_select" id="price_select-' . $event_id . '" value="true">';
+		$html .= '</select><input type="hidden" name="price_select" id="members_price_select-' . $event_id . '" value="true">';
 		
 	}
 	//echo 'ts';
