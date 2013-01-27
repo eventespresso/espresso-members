@@ -489,15 +489,11 @@ function espresso_attendee_admin_price_dropdown_member($event_id, $atts) {
 		foreach ($prices as $price) {
 			
  			// member prices
-			$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
-			$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
-			//echo $member_price;
-			//echo $member_price_type;
-			//echo $current_value;
+			$member_price = empty($price->member_price) ? $price->event_cost : $price->member_price;
+			$member_price_type = empty($price->member_price_type) ? $price->price_type : $price->member_price_type;
             
-			//Using price ID
-			//If the price id was passed to this function, we need need to select that price.
 			$selected = isset($current_value) && $current_value == $member_price_type ? ' selected="selected" ' : '';
+			
 			
 			//Create the drop down options
 			$html .= '<option ' . $selected . ' value="' . $price->id . '|' . $member_price_type . '">' . $member_price_type . ' (' . $org_options['currency_symbol'] . number_format($member_price, 2, '.', '')  . ') </option>';
