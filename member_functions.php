@@ -487,15 +487,23 @@ if (!function_exists('espresso_member_price_select_action')) {
  */
 if (!function_exists('event_espresso_get_final_price')) {
 
-	function event_espresso_get_final_price($price_id, $event_id = 0) {
+	function event_espresso_get_final_price($price_id = FALSE, $event_id = FALSE) {
 		do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, '');
+		
+		if ( ! $price_id || ! $event_id ) {
+			return 1000000;
+		}
+		
 		global $wpdb;
 		$sql = "SELECT id, event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id='" . $price_id . "' ORDER BY id ASC LIMIT 1";
 		if (is_user_logged_in()) {
 			$sql = "SELECT id, member_price event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id='" . $price_id . "' ORDER BY id ASC LIMIT 1";
 		}
+		
 		do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, 'sql=' . $sql);
+		
 		$results = $wpdb->get_results($sql);
+		
 		foreach ($results as $result) {
 			if ($wpdb->num_rows >= 1) {
 				if ($result->event_cost > 0.00) {
@@ -515,6 +523,9 @@ if (!function_exists('event_espresso_get_final_price')) {
 			} else if ($wpdb->num_rows == 0) {
 				$event_cost = __('0.00', 'event_espresso');
 			}
+		}
+		if ( event_espresso_verify_price_id( $price_id, $event_id ) == FALSE ){
+			$event_cost = espresso_return_single_price($event_id);
 		}
 		return empty($event_cost) ? 0 : $event_cost;
 	}
