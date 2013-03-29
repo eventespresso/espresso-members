@@ -120,7 +120,7 @@ if (!function_exists('event_espresso_my_events')) {
 			  </table>
 			  <div class="bottom_settings" style="clear:both; margin-bottom:30px;">
 			<input type="checkbox" name="sAll" onclick="selectAll(this)" /> <strong><?php _e('Check All','event_espresso'); ?></strong> 
-			<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" style="margin-left:100px;" onclick="return confirmDelete();"> <a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'"><?php _e('Your Profile','event_espresso'); ?></a>
+			<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" onclick="return confirmDelete();"> <a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'"><?php _e('Your Profile','event_espresso'); ?></a>
 		</div>
 			</form>
 	   </div>
