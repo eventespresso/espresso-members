@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - Members Addon
 Plugin URI: http://eventespresso.com/
 Description: Member integration addon for Event Espresso. <a href="admin.php?page=support">Support</a>
-Version: 1.9.7-beta
+Version: 1.9.7
 
 Author: Event Espresso
 Author URI: http://www.eventespresso.com
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 function espresso_members_version() {
-	return '1.9.7-beta';
+	return '1.9.7';
 }
 
 //Update notifications
@@ -40,7 +40,7 @@ function ee_members_load_pue_update() {
 		require(EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php' );
 		$api_key = $org_options['site_license_key'];
 		$host_server_url = 'http://eventespresso.com';
-		$plugin_slug = 'espresso-members-pr';
+		$plugin_slug = 'espresso-members';
 		$options = array(
 			'apikey' => $api_key,
 			'lang_domain' => 'event_espresso',
