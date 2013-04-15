@@ -30,26 +30,27 @@ if (!function_exists('event_espresso_my_events')) {
 				endwhile;	
 			}
 			?>
-		<div id="message" class="updated fade"><p><strong><?php _e('Your event(s) have been successfully removed from your account.','event_espresso'); ?></strong></p></div>
+		<div id="message" class="updated fade"><p><strong><?php _e('The event(s) have been successfully removed from your account.','event_espresso'); ?></strong></p></div>
 	<?php
 		}
 	?>
 	<form id="form1" name="form1" method="post" action="<?php echo $_SERVER["REQUEST_URI"]?>">
 	<div style="clear:both; margin-bottom:30px;"></div>
-	<table id="table" class="widefat fixed my_events_table" width="100%"> 
+	<table id="table" class="widefat my_events_table" width="100%"> 
 		<thead>
 			<tr>
 			  <th class="manage-column column-cb check-column" id="cb" scope="col" style="width:5%;"></th>
 			  <th class="manage-column column-title" id="name" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Event Name','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
 			  <th class="manage-column column-title" id="event" scope="col" title="Click to Sort" style="width: 10%;">
-				<span><?php _e('Ticket Type','event_espresso'); ?></span>
+				<span><?php _e('Type','event_espresso'); ?></span>
 				<span class="sorting-indicator"></span>
 			  </th>
-			  <th class="manage-column column-author" id="start" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Start Date','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="begins" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Start Time','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="status" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Payment Status','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="attendees" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Cost','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" title="Click to Sort" style="width:20%;">'.__('Ticket','event_espresso').'</th>':''; ?>
+			  <th class="manage-column column-author" id="start" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Date','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
+			  <th class="manage-column column-date" id="begins" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Time','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
+			  <th class="manage-column column-date" id="status" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Status','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
+			  <th class="manage-column column-date" id="attendees" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Cost','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
+			  <th class="manage-column column-date" id="invoice" scope="col" style="width:5%;"><?php _e('Invoice','event_espresso'); ?></th>
+			  <?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" style="width:10%;">'.__('Ticket','event_espresso').'</th>':''; ?>
 			</tr>
 	</thead>
 		<tbody>
@@ -101,7 +102,7 @@ if (!function_exists('event_espresso_my_events')) {
 						
 						//New ticketing system suport
 						if (function_exists('espresso_ticket_launch')){
-							$ticket_link = ''. espresso_ticket_links($registration_id, $attendee_id) . '';
+							$ticket_link = espresso_ticket_links($registration_id, $attendee_id);
 						}
 	
 	?>
@@ -113,6 +114,7 @@ if (!function_exists('event_espresso_my_events')) {
 				  <td class="date column-date"><?php echo $start_time?></td>
 				  <td class="date column-date"><?php echo '<a target="_blank" href="' . $payment_url . '" title="'.__('View Your Payment Details').'">'; ?><?php event_espresso_paid_status_icon( $payment_status ) . '</a>'; ?></td>
 				  <td class="date column-date"><?php echo $org_options[ 'currency_symbol' ] ?><?php echo $amount_pd?></td>
+				  <td class="date column-date"><a href="<?php echo home_url();?>/?download_invoice=true&amp;admin=true&amp;registration_id=<?php echo $registration_id ?>" target="_blank"  title="<?php _e('Download Invoice', 'event_espresso'); ?>"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/page_white_acrobat.png" width="16" height="16" alt="<?php _e('Download Invoice', 'event_espresso'); ?>" /></a></td>
 				  <?php echo $ticketing_installed == true?'<td class="post-title page-title column-title">'.$ticket_link.'</td>':''; ?>
 				  </tr>
 		<?php } 
@@ -122,7 +124,7 @@ if (!function_exists('event_espresso_my_events')) {
 			  </table>
 			  <div class="bottom_settings" style="clear:both; margin-bottom:30px;">
 			<input type="checkbox" name="sAll" onclick="selectAll(this)" /> <strong><?php _e('Check All','event_espresso'); ?></strong> 
-			<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" style="margin-left:100px;" onclick="return confirmDelete();"> <a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'"><?php _e('Your Profile','event_espresso'); ?></a>
+			<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" onclick="return confirmDelete();"> <a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'"><?php _e('Your Profile','event_espresso'); ?></a>
 		</div>
 			</form>
 	   </div>
@@ -146,8 +148,9 @@ if (!function_exists('event_espresso_my_events')) {
 								 null,
 								 null,
 								 null,
-								<?php echo $ticketing_installed == true?'null,':'';?>
-								 null
+								 null,
+								 { "bSortable": false },
+								<?php echo $ticketing_installed == true?'{ "bSortable": false }':'';?>
 							]
 	
 		} );
