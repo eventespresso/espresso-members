@@ -4,8 +4,15 @@ if (!function_exists('event_espresso_my_events')) {
 		global $espresso_premium; if ($espresso_premium != true) return;
 		global $wpdb, $org_options;	
 		global $ticketing_installed;
-		//$wpdb->show_errors();
 		require_once('user_vars.php');
+		if( ! is_user_logged_in() ){ 
+			if( $login_page != '' ) {
+				printf('<p>Please <a href="%s">log in</a> to view the events you are registered to attend.</p>', $login_page );
+			}else{
+				echo '<p>You must be logged in to view this page.</p>'; 
+				return; 
+			}
+		}
 		?>
 		
 		<div id="configure_organization_form" class="wrap meta-box-sortables ui-sortable">
@@ -13,16 +20,13 @@ if (!function_exists('event_espresso_my_events')) {
 		<div id="icon-options-event" class="icon32"></div><h2><?php echo _e('My Events Management', 'event_espresso') ?></h2>
 		<div id="poststuff" class="metabox-holder">
 	<?php
-		if($_POST['cancel_registration']){
+		if(isset($_POST['cancel_registration'])){
 			if (is_array($_POST['checkbox'])){
 				while(list($key,$value)=each($_POST['checkbox'])):
-					$del_id=$key;
-					//Delete discount data
-					$sql = "DELETE FROM " . EVENTS_ATTENDEE_TABLE . " WHERE id='$del_id'";
-					$wpdb->query($sql);
-					
-					$sql = "DELETE FROM " . EVENTS_MEMBER_REL_TABLE . " WHERE attendee_id='$del_id'";
-					$wpdb->query($sql);
+					$del_attendee = $wpdb->prepare("DELETE FROM " . EVENTS_ATTENDEE_TABLE . " WHERE id = %d", $key ); 
+					$wpdb->query( $del_attendee ); 
+					$del_attendee_member_rel = $wpdb->prepare("DELETE FROM " . EVENTS_MEMBER_REL_TABLE . " WHERE attendee_id = %d and user_id = %d", $key, $userid ); 
+					$wpdb->query( $del_attendee_member_rel );
 				endwhile;	
 			}
 			?>
@@ -53,7 +57,7 @@ if (!function_exists('event_espresso_my_events')) {
 	<?php 
 			$wpdb->get_results("SELECT id FROM ". EVENTS_MEMBER_REL_TABLE . " WHERE user_id = '" . $current_user->ID . "'");
 			if ($wpdb->num_rows > 0) {
-				$events = $wpdb->get_results("SELECT e.id event_id, e.event_name, e.event_code, e.start_date, e.event_desc, e.display_desc, a.id attendee_id, a.event_time start_time, a.payment_status, a.payment_date, a.amount_pd, u.user_id user_id, a.registration_id, a.lname, a.lname, a.price_option, a.event_time
+				$events = $wpdb->get_results("SELECT e.id event_id, e.event_name, e.event_code, e.start_date, e.event_desc, e.display_desc, a.id attendee_id, a.event_time start_time, a.payment_status, a.payment_date, a.amount_pd, u.user_id user_id, a.registration_id, a.fname, a.lname, a.price_option, a.event_time
 													FROM " . EVENTS_ATTENDEE_TABLE . " a
 													JOIN " . EVENTS_MEMBER_REL_TABLE . " u ON u.attendee_id = a.id
 													JOIN " . EVENTS_DETAIL_TABLE . " e ON e.id = u.event_id
@@ -63,8 +67,8 @@ if (!function_exists('event_espresso_my_events')) {
 						$event_code = $event->event_code;
 						$attendee_id = $event->attendee_id;
 						$registration_id = $event->registration_id;
-						$lname = $attendee->lname;
-						$fname = $attendee->fname;
+						$lname = $event->lname;
+						$fname = $event->fname;
 						$event_name = $event->event_name;
 						$start_date = $event->start_date;
 						$start_time = $event->start_time;
