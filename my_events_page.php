@@ -4,6 +4,8 @@ if (!function_exists('event_espresso_my_events')) {
 		global $espresso_premium; if ($espresso_premium != true) return;
 		global $wpdb, $org_options;	
 		global $ticketing_installed;
+		$notifications['success'] = array(); 
+		$notifications['error']	 = array(); 
 		require_once('user_vars.php');
 		if( ! is_user_logged_in() ){ 
 			if( $login_page != '' ) {
@@ -14,47 +16,82 @@ if (!function_exists('event_espresso_my_events')) {
 			}
 		}
 		?>
-		
-		<div id="configure_organization_form" class="wrap meta-box-sortables ui-sortable">
-		<div id="event_reg_theme" class="wrap">
-		<div id="icon-options-event" class="icon32"></div><h2><?php echo _e('My Events Management', 'event_espresso') ?></h2>
+
+<div id="configure_organization_form" class="wrap meta-box-sortables ui-sortable">
+	<div id="event_reg_theme" class="wrap">
+		<div id="icon-options-event" class="icon32"></div>
+		<h2><?php echo _e('My Events Management', 'event_espresso') ?></h2>
 		<div id="poststuff" class="metabox-holder">
-	<?php
+			<?php
 		if(isset($_POST['cancel_registration'])){
 			if (is_array($_POST['checkbox'])){
 				while(list($key,$value)=each($_POST['checkbox'])):
-					$del_attendee = $wpdb->prepare("DELETE FROM " . EVENTS_ATTENDEE_TABLE . " WHERE id = %d", $key ); 
-					$wpdb->query( $del_attendee ); 
-					$del_attendee_member_rel = $wpdb->prepare("DELETE FROM " . EVENTS_MEMBER_REL_TABLE . " WHERE attendee_id = %d and user_id = %d", $key, $userid ); 
-					$wpdb->query( $del_attendee_member_rel );
+					
+					$set_cols_and_values = array( 
+						'payment_status' => 'Cancelled',
+					);
+					$set_format = array( '%s', );
+					$where_cols_and_values = array( 'id'=> $key );
+					$where_format = array( '%d' );
+					// run the update
+					$upd_success = $wpdb->update( EVENTS_ATTENDEE_TABLE, $set_cols_and_values, $where_cols_and_values, $set_format, $where_format );
+					if ( $upd_success === FALSE ) {
+						$notifications['error'][] = __('An error occured. The registration was not cancelled.', 'event_espresso');
+					}else{
+						$notifications['success'][] = __('You have cancelled your registration.', 'event_espresso'); 
+					}
+					
 				endwhile;	
 			}
-			?>
-		<div id="message" class="updated fade"><p><strong><?php _e('The event(s) have been successfully removed from your account.','event_espresso'); ?></strong></p></div>
-	<?php
+			
+		// display success messages
+	if ( ! empty( $notifications['success'] )) { 
+		$success_msg = implode( $notifications['success'], '<br />' );
+	?>
+			<div id="message" class="updated fade">
+				<p> <strong><?php echo $success_msg; ?></strong> </p>
+			</div>
+			<?php
+	 } 
+	// display error messages
+	if ( ! empty( $notifications['error'] )) {
+		$error_msg = implode( $notifications['error'], '<br />' );
+	?>
+			<div id="message" class="error">
+				<p> <strong><?php echo $error_msg; ?></strong> </p>
+			</div>
+			<?php } 
 		}
 	?>
-	<form id="form1" name="form1" method="post" action="<?php echo $_SERVER["REQUEST_URI"]?>">
-	<div style="clear:both; margin-bottom:30px;"></div>
-	<table id="table" class="widefat my_events_table" width="100%"> 
-		<thead>
-			<tr>
-			  <th class="manage-column column-cb check-column" id="cb" scope="col" style="width:5%;"></th>
-			  <th class="manage-column column-title" id="name" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Event Name','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-title" id="event" scope="col" title="Click to Sort" style="width: 10%;">
-				<span><?php _e('Type','event_espresso'); ?></span>
-				<span class="sorting-indicator"></span>
-			  </th>
-			  <th class="manage-column column-author" id="start" scope="col" title="Click to Sort" style="width:10%;"><span><?php _e('Date','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="begins" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Time','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="status" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Status','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="attendees" scope="col" title="Click to Sort" style="width:5%;"><span><?php _e('Cost','event_espresso'); ?></span><span class="sorting-indicator"></span></th>
-			  <th class="manage-column column-date" id="invoice" scope="col" style="width:5%;"><?php _e('Invoice','event_espresso'); ?></th>
-			  <?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" style="width:10%;">'.__('Ticket','event_espresso').'</th>':''; ?>
-			</tr>
-	</thead>
-		<tbody>
-	<?php 
+			<form id="form1" name="form1" method="post" action="<?php echo $_SERVER["REQUEST_URI"]?>">
+				<div style="clear:both; margin-bottom:30px;"></div>
+				<table id="table" class="widefat my_events_table" width="100%">
+					<thead>
+						<tr>
+							<th class="manage-column column-cb check-column" id="cb" scope="col" style="width:5%;"></th>
+							<th class="manage-column column-title" id="name" scope="col" title="Click to Sort" style="width:10%;"><span>
+								<?php _e('Event Name','event_espresso'); ?>
+								</span><span class="sorting-indicator"></span></th>
+							<th class="manage-column column-title" id="event" scope="col" title="Click to Sort" style="width: 10%;"> <span>
+								<?php _e('Type','event_espresso'); ?>
+								</span> <span class="sorting-indicator"></span> </th>
+							<th class="manage-column column-author" id="start" scope="col" title="Click to Sort" style="width:10%;"><span>
+								<?php _e('Date','event_espresso'); ?>
+								</span><span class="sorting-indicator"></span></th>
+							<th class="manage-column column-date" id="begins" scope="col" title="Click to Sort" style="width:5%;"><span>
+								<?php _e('Time','event_espresso'); ?>
+								</span><span class="sorting-indicator"></span></th>
+							<th class="manage-column column-date" id="status" scope="col" title="Click to Sort" style="width:5%;"><span>
+								<?php _e('Status','event_espresso'); ?>
+								</span><span class="sorting-indicator"></span></th>
+							<th class="manage-column column-date" id="attendees" scope="col" title="Click to Sort" style="width:5%;"><span>
+								<?php _e('Cost','event_espresso'); ?>
+								</span><span class="sorting-indicator"></span></th>
+							<th class="manage-column column-date" id="invoice" scope="col" style="width:5%;"><?php _e('Invoice','event_espresso'); ?></th>
+							<?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" style="width:10%;">'.__('Ticket','event_espresso').'</th>':''; ?> </tr>
+					</thead>
+					<tbody>
+						<?php 
 			$wpdb->get_results("SELECT id FROM ". EVENTS_MEMBER_REL_TABLE . " WHERE user_id = '" . $current_user->ID . "'");
 			if ($wpdb->num_rows > 0) {
 				$events = $wpdb->get_results("SELECT e.id event_id, e.event_name, e.event_code, e.start_date, e.event_desc, e.display_desc, a.id attendee_id, a.event_time start_time, a.payment_status, a.payment_date, a.amount_pd, u.user_id user_id, a.registration_id, a.fname, a.lname, a.price_option, a.event_time
@@ -106,32 +143,36 @@ if (!function_exists('event_espresso_my_events')) {
 						}
 	
 	?>
-		<tr>
-		<td><input name="checkbox[<?php echo $attendee_id?>]" type="checkbox"  title="Cancel registration for <?php echo $event_name?>"></td>
-				  <td class="post-title page-title column-title"><strong><?php echo $event_link?></strong> </td>
-				  <td class="post-title page-title column-title"><?php echo $ticket_type ?></td>
-				  <td class="date column-date"><?php echo event_date_display($start_date)?></td>
-				  <td class="date column-date"><?php echo $start_time?></td>
-				  <td class="date column-date"><?php echo '<a target="_blank" href="' . $payment_url . '" title="'.__('View Your Payment Details').'">'; ?><?php event_espresso_paid_status_icon( $payment_status ) . '</a>'; ?></td>
-				  <td class="date column-date"><?php echo $org_options[ 'currency_symbol' ] ?><?php echo $amount_pd?></td>
-				  <td class="date column-date"><a href="<?php echo home_url();?>/?download_invoice=true&amp;admin=true&amp;registration_id=<?php echo $registration_id ?>" target="_blank"  title="<?php _e('Download Invoice', 'event_espresso'); ?>"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/page_white_acrobat.png" width="16" height="16" alt="<?php _e('Download Invoice', 'event_espresso'); ?>" /></a></td>
-				  <?php echo $ticketing_installed == true?'<td class="post-title page-title column-title">'.$ticket_link.'</td>':''; ?>
-				  </tr>
-		<?php } 
+						<tr>
+							<td><input name="checkbox[<?php echo $attendee_id?>]" type="checkbox"  title="Cancel registration for <?php echo $event_name?>"></td>
+							<td class="post-title page-title column-title"><strong><?php echo $event_link?></strong></td>
+							<td class="post-title page-title column-title"><?php echo $ticket_type ?></td>
+							<td class="date column-date"><?php echo event_date_display($start_date)?></td>
+							<td class="date column-date"><?php echo $start_time?></td>
+							<td class="date column-date"><?php echo '<a target="_blank" href="' . $payment_url . '" title="'.__('View Your Payment Details').'">'; ?>
+								<?php event_espresso_paid_status_icon( $payment_status ) . '</a>'; ?></td>
+							<td class="date column-date"><?php echo $org_options[ 'currency_symbol' ] ?><?php echo $amount_pd?></td>
+							<td class="date column-date"><a href="<?php echo home_url();?>/?download_invoice=true&amp;admin=true&amp;registration_id=<?php echo $registration_id ?>" target="_blank"  title="<?php _e('Download Invoice', 'event_espresso'); ?>"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/page_white_acrobat.png" width="16" height="16" alt="<?php _e('Download Invoice', 'event_espresso'); ?>" /></a></td>
+							<?php echo $ticketing_installed == true?'<td class="post-title page-title column-title">'.$ticket_link.'</td>':''; ?> </tr>
+						<?php } 
 			}
 			?>
-			  </tbody>
-			  </table>
-			  <div class="bottom_settings" style="clear:both; margin-bottom:30px;">
-			<input type="checkbox" name="sAll" onclick="selectAll(this)" /> <strong><?php _e('Check All','event_espresso'); ?></strong> 
-			<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" onclick="return confirmDelete();"> <a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'"><?php _e('Your Profile','event_espresso'); ?></a>
-		</div>
+					</tbody>
+				</table>
+				<div class="bottom_settings" style="clear:both; margin-bottom:30px;">
+					<input type="checkbox" name="sAll" onclick="selectAll(this)" />
+					<strong>
+					<?php _e('Check All','event_espresso'); ?>
+					</strong>
+					<input name="cancel_registration" type="submit" class="button-secondary" id="cancel_registration" value="<?php _e('Cancel Registration','event_espresso'); ?>" onclick="return confirmDelete();">
+					<a style="margin-left:20px" class="button-primary"  onclick="window.location='<?php echo admin_url(); ?>profile.php#event_espresso_profile'">
+					<?php _e('Your Profile','event_espresso'); ?>
+					</a> </div>
 			</form>
-	   </div>
-	</div>       
-			 </div> 
-	
-	<script>
+		</div>
+	</div>
+</div>
+<script>
 	jQuery(document).ready(function($) {						
 			
 		/* show the table data */
@@ -156,8 +197,8 @@ if (!function_exists('event_espresso_my_events')) {
 		} );
 		
 	} );
-	</script>	
-	<?php
+	</script>
+<?php
 	}
 
 }
