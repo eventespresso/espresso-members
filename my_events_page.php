@@ -24,8 +24,8 @@ if (!function_exists('event_espresso_my_events')) {
 		<h2><?php echo _e('My Events Management', 'event_espresso') ?></h2>
 		<div id="poststuff" class="metabox-holder">
 			<?php
-		if(isset($_POST['cancel_registration'])){
-			if (is_array($_POST['checkbox'])){
+		if( filter_has_var( INPUT_POST, 'cancel_registration' ) && $_POST['cancel_registration'] == true ){
+			if( filter_has_var( INPUT_POST, 'checkbox' ) && is_array( $_POST['checkbox'] ) ){
 								
 				while(list($key,$value)=each($_POST['checkbox'])){
 					
@@ -36,7 +36,7 @@ if (!function_exists('event_espresso_my_events')) {
 								SET ea.payment_status = 'Cancelled'
 							WHERE emr.attendee_id = %d and emr.user_id = %d",
 							$key,
-							$current_user->ID
+							$userid
 						)
 					);
 					
@@ -52,25 +52,25 @@ if (!function_exists('event_espresso_my_events')) {
 				
 			}
 			
-		// display success messages
-	if ( ! empty( $notifications['success'] )) { 
-		$success_msg = implode( $notifications['success'], '<br />' );
-	?>
+			// display success messages
+			if ( ! empty( $notifications['success'] )) { 
+				$success_msg = implode( $notifications['success'], '<br />' );
+			?>
 			<div id="message" class="updated fade">
 				<p> <strong><?php echo $success_msg; ?></strong> </p>
 			</div>
 			<?php
-	 } 
-	// display error messages
-	if ( ! empty( $notifications['error'] )) {
-		$error_msg = implode( $notifications['error'], '<br />' );
-	?>
+			 } 
+			// display error messages
+			if ( ! empty( $notifications['error'] )) {
+				$error_msg = implode( $notifications['error'], '<br />' );
+			?>
 			<div id="message" class="error">
 				<p> <strong><?php echo $error_msg; ?></strong> </p>
 			</div>
 			<?php } 
-		}
-	?>
+				}
+			?>
 			<form id="form1" name="form1" method="post" action="<?php echo $_SERVER["REQUEST_URI"]?>">
 				<div style="clear:both; margin-bottom:30px;"></div>
 				<table id="table" class="widefat my_events_table" width="100%">
@@ -99,7 +99,7 @@ if (!function_exists('event_espresso_my_events')) {
 							<?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" style="width:10%;">'.__('Ticket','event_espresso').'</th>':''; ?> </tr>
 					</thead>
 					<tbody>
-			<?php 
+						<?php 
 			$wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT id FROM ". EVENTS_MEMBER_REL_TABLE . " WHERE user_id = '%d'",
@@ -289,3 +289,4 @@ if (!function_exists('espresso_send_attendee_cancel_notification')) {
 
 }
 add_action('action_hook_espresso_after_registration_cancellation', 'espresso_send_attendee_cancel_notification', 10, 1);
+
