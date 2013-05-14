@@ -276,7 +276,7 @@ if (!function_exists('espresso_send_attendee_cancel_notification')) {
 		$headers .= "Content-Type: text/html; charset=utf-8\r\n";
 
 		//Send an email to the attendee
-		$att_email_subject = 'Registration Cancellation for ' .$data->event->event_name;
+		$att_email_subject = 'Cancellation for ' .$data->event->event_name;
 		$att_email_body = sprintf(__('%sHello %s,%s You have successfully cancelled your registration for %s.%s', 'event_espresso'), '<p>', $data->event->fname, '</p><p>', $data->event->event_name, '</p>');
 		wp_mail($data->event->email, stripslashes_deep(html_entity_decode($att_email_subject, ENT_QUOTES, "UTF-8")), stripslashes_deep(html_entity_decode(wpautop($att_email_body), ENT_QUOTES, "UTF-8")), $headers);
 		
