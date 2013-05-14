@@ -9,9 +9,10 @@ if (!function_exists('event_espresso_my_events')) {
 		require_once('user_vars.php');
 		if( ! is_user_logged_in() ){ 
 			if( $login_page != '' ) {
-				printf('<p>Please <a href="%s">log in</a> to view the events you are registered to attend.</p>', $login_page );
+				echo '<p>'.sprintf(__('Please <a href="%s">log in</a> to view the events you are registered to attend.', 'event_espresso'), $login_page ).'</p>';
+				return;
 			}else{
-				echo '<p>You must be logged in to view this page.</p>'; 
+				echo '<p>'.__('You must be logged in to view this page.', 'event_espresso').'</p>';
 				return; 
 			}
 		}
@@ -25,23 +26,30 @@ if (!function_exists('event_espresso_my_events')) {
 			<?php
 		if(isset($_POST['cancel_registration'])){
 			if (is_array($_POST['checkbox'])){
-				while(list($key,$value)=each($_POST['checkbox'])):
+								
+				while(list($key,$value)=each($_POST['checkbox'])){
 					
-					$set_cols_and_values = array( 
-						'payment_status' => 'Cancelled',
+					//Update the attendee payment status to 'Cancelled'
+					$upd_success = $wpdb->query( 
+						$wpdb->prepare( 
+							"UPDATE " . EVENTS_ATTENDEE_TABLE . " ea JOIN " . EVENTS_MEMBER_REL_TABLE . " emr ON (emr.attendee_id = ea.id) 
+								SET ea.payment_status = 'Cancelled'
+							WHERE emr.attendee_id = %d and emr.user_id = %d",
+							$key,
+							$current_user->ID
+						)
 					);
-					$set_format = array( '%s', );
-					$where_cols_and_values = array( 'id'=> $key );
-					$where_format = array( '%d' );
-					// run the update
-					$upd_success = $wpdb->update( EVENTS_ATTENDEE_TABLE, $set_cols_and_values, $where_cols_and_values, $set_format, $where_format );
+					
 					if ( $upd_success === FALSE ) {
 						$notifications['error'][] = __('An error occured. The registration was not cancelled.', 'event_espresso');
 					}else{
-						$notifications['success'][] = __('You have cancelled your registration.', 'event_espresso'); 
+						//If there are no errors, send a confirmation email
+						do_action('action_hook_espresso_after_registration_cancellation', array('attendee_id'=>$key) );
 					}
-					
-				endwhile;	
+				}
+				
+				$notifications['success'][] = __('You have cancelled your registration(s).', 'event_espresso');
+				
 			}
 			
 		// display success messages
@@ -91,39 +99,53 @@ if (!function_exists('event_espresso_my_events')) {
 							<?php echo $ticketing_installed == true?'<th class="manage-column column-author" id="ticket" scope="col" style="width:10%;">'.__('Ticket','event_espresso').'</th>':''; ?> </tr>
 					</thead>
 					<tbody>
-						<?php 
-			$wpdb->get_results("SELECT id FROM ". EVENTS_MEMBER_REL_TABLE . " WHERE user_id = '" . $current_user->ID . "'");
+			<?php 
+			$wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id FROM ". EVENTS_MEMBER_REL_TABLE . " WHERE user_id = '%d'",
+					$current_user->ID
+				)
+			);
+			
 			if ($wpdb->num_rows > 0) {
-				$events = $wpdb->get_results("SELECT e.id event_id, e.event_name, e.event_code, e.start_date, e.event_desc, e.display_desc, a.id attendee_id, a.event_time start_time, a.payment_status, a.payment_date, a.amount_pd, u.user_id user_id, a.registration_id, a.fname, a.lname, a.price_option, a.event_time
-													FROM " . EVENTS_ATTENDEE_TABLE . " a
-													JOIN " . EVENTS_MEMBER_REL_TABLE . " u ON u.attendee_id = a.id
-													JOIN " . EVENTS_DETAIL_TABLE . " e ON e.id = u.event_id
-													WHERE u.user_id = '" . $current_user->ID . "'");
+				$events = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT e.id event_id, e.event_name, e.event_code, e.start_date, e.event_desc, e.display_desc, a.id attendee_id, a.event_time start_time, a.payment_status, a.payment_date, a.amount_pd, u.user_id user_id, a.registration_id, a.fname, a.lname, a.price_option, a.event_time
+							FROM " . EVENTS_ATTENDEE_TABLE . " a
+							JOIN " . EVENTS_MEMBER_REL_TABLE . " u ON u.attendee_id = a.id
+							JOIN " . EVENTS_DETAIL_TABLE . " e ON e.id = u.event_id
+						WHERE u.user_id = '%d' AND a.payment_status != 'Cancelled'",
+						$current_user->ID
+					)
+				);
+				
 				foreach ($events as $event){
-						$event_id = $event->event_id;
-						$event_code = $event->event_code;
-						$attendee_id = $event->attendee_id;
-						$registration_id = $event->registration_id;
-						$lname = $event->lname;
-						$fname = $event->fname;
-						$event_name = $event->event_name;
-						$start_date = $event->start_date;
-						$start_time = $event->start_time;
-						$event_desc = $event->event_desc;
-						$display_desc = $event->display_desc;
-						$payment_status = $event->payment_status;
-						$amount_pd = espresso_attendee_price(array('attendee_id'=>$attendee_id));
-						$payment_date = $event->payment_date;
-						$ticket_type = $event->price_option;
+						$event_id			= $event->event_id;
+						$event_code			= $event->event_code;
+						$attendee_id		= $event->attendee_id;
+						$registration_id	= $event->registration_id;
+						$lname				= $event->lname;
+						$fname				= $event->fname;
+						$event_name			= $event->event_name;
+						$start_date			= $event->start_date;
+						$start_time			= $event->start_time;
+						$event_desc			= $event->event_desc;
+						$display_desc		= $event->display_desc;
+						$payment_status		= $event->payment_status;
+						$amount_pd			= espresso_attendee_price(array('attendee_id'=>$attendee_id));
+						$payment_date		= $event->payment_date;
+						$ticket_type		= $event->price_option;
+						
 						if ($payment_status == ''){
 							$payment_link = get_option('siteurl') . "/?page_id=" . $org_options['return_url'] . "&id=" . $attendee_id;
 							$payment_status = '<a href="' . $payment_link . '">Pay Now</a>';
 						}
+						
 						$event_url = home_url() . "/?page_id=" . $org_options['event_page_id']. "&regevent_action=register&event_id=". $event_id;
 						$event_link = '<a class="row-title" href="' . $event_url . '">' . stripslashes_deep($event->event_name) . '</a>';
+						
 						//Build the payment link
 						$payment_url = home_url() . "/?page_id=" . $org_options['return_url'] . "&amp;registration_id=" . $registration_id;
-						//$payment_link = '<a href="' . $payment_url . '" title="'.__('View Your Payment Details').'">' . event_espresso_paid_status_icon( $payment_status ) . '</a>';
 						
 						//Deprecated ticketing system support
 						//If the custom ticket is available, load the template file
@@ -205,6 +227,9 @@ if (!function_exists('event_espresso_my_events')) {
 
 //Create a shortcode to place on a page
 function event_espresso_my_events_fview(){
+	global $this_is_a_reg_page;
+	$this_is_a_reg_page = TRUE;
+	
 	echo event_espresso_my_events();
 	wp_enqueue_style('my_events_table', EVNT_MBR_PLUGINFULLURL . 'styles/my_events_table.css'); //My events table css
 	wp_enqueue_script('dataTables', EVENT_ESPRESSO_PLUGINFULLURL . 'scripts/jquery.dataTables.min.js', array('jquery')); //Events core table script
@@ -214,3 +239,53 @@ function event_espresso_my_events_fview(){
 	return;
 }
 add_shortcode('ESPRESSO_MY_EVENTS', 'event_espresso_my_events_fview');
+
+
+//Cancellation notifications
+if (!function_exists('espresso_send_attendee_cancel_notification')) {
+
+	function espresso_send_attendee_cancel_notification($atts) {
+		
+		do_action('action_hook_espresso_log', __FILE__, __FUNCTION__, '');
+		
+		global $wpdb, $org_options;
+		$data = new stdClass;
+		
+		//Extract the attendee_id
+		extract($atts);
+
+		if ( empty( $attendee_id )) {
+			return;
+		}
+		
+		$sql = "SELECT ed.id event_id, ed.event_name, ea.email, ea.fname, ea.lname, ea.id att_id, ea.registration_id ";
+		$sql .= " FROM " . EVENTS_DETAIL_TABLE . " ed ";
+		$sql .= " JOIN " . EVENTS_ATTENDEE_TABLE . " ea ON ea.event_id=ed.id ";
+		$sql .= " WHERE ea.id = '%d' ";
+		$data->event = $wpdb->get_row( $wpdb->prepare($sql,$attendee_id), OBJECT );
+		
+		//Define email headers
+		$headers = "";
+		if ($org_options['email_fancy_headers']=='Y') {
+			$headers .= "From: " . $org_options['organization'] . " <" . $org_options['contact_email'] . ">\r\n";
+			$headers .= "Reply-To: " . $org_options['organization'] . "  <" . $org_options['contact_email'] . ">\r\n";
+		} else {
+			$headers .= "From: " . $org_options['contact_email'] . "\r\n";
+			$headers .= "Reply-To: " . $org_options['contact_email'] . "\r\n";
+		}
+		$headers .= "Content-Type: text/html; charset=utf-8\r\n";
+
+		//Send an email to the attendee
+		$att_email_subject = 'Registration Cancellation for ' .$data->event->event_name;
+		$att_email_body = sprintf(__('%sHello %s,%s You have successfully cancelled your registration for %s.%s', 'event_espresso'), '<p>', $data->event->fname, '</p><p>', $data->event->event_name, '</p>');
+		wp_mail($data->event->email, stripslashes_deep(html_entity_decode($att_email_subject, ENT_QUOTES, "UTF-8")), stripslashes_deep(html_entity_decode(wpautop($att_email_body), ENT_QUOTES, "UTF-8")), $headers);
+		
+		//Send an email to the admin
+		$admin_email_subject = sprintf(__('Registration Cancellation for %s', 'event_espresso'), $data->event->fname . ' ' . $data->event->lname);
+		$admin_email_body = sprintf(__('The attendee %s has cancelled their registration for %s.', 'event_espresso'), espresso_edit_attendee($data->event->registration_id, $data->event->att_id, $data->event->event_id, 'admin', $data->event->fname . ' ' . $data->event->lname), $data->event->event_name);
+		wp_mail($org_options['contact_email'], stripslashes_deep(html_entity_decode($admin_email_subject, ENT_QUOTES, "UTF-8")), stripslashes_deep(html_entity_decode(wpautop($admin_email_body), ENT_QUOTES, "UTF-8")), $headers);
+		
+	}
+
+}
+add_action('action_hook_espresso_after_registration_cancellation', 'espresso_send_attendee_cancel_notification', 10, 1);
