@@ -8,6 +8,7 @@ function event_espresso_member_config_mnu() {
 		$member_options['register_page'] = isset($_POST['register_page']) && !empty($_POST['register_page']) ? $_POST['register_page'] : '';
 		$member_options['member_only_all'] = isset($_POST['member_only_all']) && !empty($_POST['member_only_all']) ? $_POST['member_only_all'] : '';
 		$member_options['autofilled_editable'] = isset($_POST['autofilled_editable']) && !empty($_POST['autofilled_editable']) ? $_POST['autofilled_editable'] : '';
+		$member_options = apply_filters('filter_hook_espresso_save_member_settings', $member_options);
 		update_option('events_member_settings', $member_options);
 		echo '<div id="message" class="updated fade"><p><strong>' . __('Member settings saved.', 'event_espresso') . '</strong></p></div>';
 	}
@@ -16,6 +17,7 @@ function event_espresso_member_config_mnu() {
 	$register_page = empty($member_options['register_page']) ? '' : $member_options['register_page'];
 	$member_only_all = empty($member_options['member_only_all']) ? 'N' : $member_options['member_only_all'];
 	$autofilled_editable = empty($member_options['autofilled_editable']) ? 'N' : $member_options['autofilled_editable'];
+	
 	?>
 	<div id="event_reg_theme" class="wrap">
 		<div id="icon-options-event" class="icon32"></div>
@@ -27,6 +29,7 @@ function event_espresso_member_config_mnu() {
 				<div class="inside">
 					<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
 						<ul>
+							<?php do_action('action_hook_espresso_member_settings_form_top');?>
 							<li>
 								<label><?php _e('Login page (if different from default Wordpress login page): ', 'event_espresso'); ?></label> <input type="text" name="login_page" size="25" <?php echo (isset($login_page) ? 'value="' . $login_page . '"' : "") ?>></li>
 
@@ -54,6 +57,7 @@ function event_espresso_member_config_mnu() {
 								echo select_input('autofilled_editable', $values, $autofilled_editable);
 								?>
 							</li>
+							<?php do_action('action_hook_espresso_member_settings_form_bottom');?>
 							<li>
 								<input type="hidden" name="update_member_settings" value="update">
 								<p>

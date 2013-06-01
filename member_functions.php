@@ -210,7 +210,7 @@ if (!function_exists('event_espresso_get_price')) {
 			return;
 		$org_options = get_option('events_organization_settings');
 		global $wpdb;
-		if (is_user_logged_in()) {
+		if (espresso_above_member_threshold()) {
 			$prices = $wpdb->get_results("SELECT event_cost, member_price FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC LIMIT 1");
 		} else {
 			$prices = $wpdb->get_results("SELECT event_cost FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC LIMIT 1");
@@ -366,7 +366,7 @@ function event_espresso_price_dropdown($event_id, $atts) {
 
 	//Initial price query
 	//If the user is looged in, create a special query to get the member price
-	if (is_user_logged_in()) {
+	if (espresso_above_member_threshold()) {
 		$sql = "SELECT id, event_cost, surcharge, surcharge_type, member_price, member_price_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
 	} else {
 		$sql = "SELECT id, event_cost, surcharge, surcharge_type, price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id='" . $event_id . "' ORDER BY id ASC";
@@ -384,7 +384,7 @@ function event_espresso_price_dropdown($event_id, $atts) {
 
 		foreach ($prices as $price) {
 
-           if (is_user_logged_in()) {
+           if (espresso_above_member_threshold()) {
  				// member prices
 				$member_price = $price->member_price == "" ? $price->event_cost : $price->member_price;
 				$member_price_type = $price->member_price_type == "" ? $price->price_type : $price->member_price_type;
@@ -425,7 +425,7 @@ function event_espresso_price_dropdown($event_id, $atts) {
 		foreach ($prices as $price) {
 
 			//Convert to the member price if the user is logged in
-			if (is_user_logged_in()) {
+			if (espresso_above_member_threshold()) {
 				$member_price = $price->member_price;
 			} else {
 				$member_price = $price->event_cost;
@@ -543,7 +543,7 @@ if (!function_exists('event_espresso_get_final_price')) {
 		
 		global $wpdb;
 		$sql = "SELECT id, event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id='" . $price_id . "' ORDER BY id ASC LIMIT 1";
-		if (is_user_logged_in()) {
+		if (espresso_above_member_threshold()) {
 			$sql = "SELECT id, member_price event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id='" . $price_id . "' ORDER BY id ASC LIMIT 1";
 		}
 		
@@ -583,7 +583,7 @@ if (!function_exists('event_espresso_get_final_price')) {
 
 
 function event_espresso_filter_orig_price_and_surcharge_sql_for_members( $SQL ) {
-	if (is_user_logged_in()) {
+	if (espresso_above_member_threshold()) {
 		// id 	event_id 	price_type 	event_cost 	surcharge 	surcharge_type 	member_price_type 	member_price 	max_qty 	max_qty_members
 		$SQL = "SELECT id, member_price AS event_cost, surcharge, surcharge_type FROM " . EVENTS_PRICES_TABLE . " WHERE id=%d ORDER BY id ASC LIMIT 1";
 	}
@@ -594,7 +594,7 @@ add_filter( 'filter_hook_espresso_orig_price_and_surcharge_sql', 'event_espresso
 
 
 function event_espresso_filter_group_price_dropdown_sql_for_members( $SQL ) {
-	if (is_user_logged_in()) {
+	if (espresso_above_member_threshold()) {
 		// id 	event_id 	price_type 	event_cost 	surcharge 	surcharge_type 	member_price_type 	member_price 	max_qty 	max_qty_members
 		$SQL = "SELECT ept.id, ept.member_price AS event_cost, ept.surcharge, ept.surcharge_type, ept.member_price_type AS price_type, edt.allow_multiple, edt.additional_limit ";
 		$SQL .= "FROM " . EVENTS_PRICES_TABLE . " ept ";
@@ -833,3 +833,16 @@ function event_espresso_member_edit_profile_display() {
 	return $buffer;
 }
 add_shortcode( 'ESPRESSO_EDIT_PROFILE', 'event_espresso_member_edit_profile_display' );
+
+function espresso_above_member_threshold() {
+	static $member;
+	if (empty($member)) {
+		if (is_user_logged_in()) {
+			$member = TRUE;
+		} else {
+			$member = FALSE;
+		}	
+	}	
+	$member = apply_filters('filter_hook_espresso_above_member_threshold', $member);
+	return $member;
+}
