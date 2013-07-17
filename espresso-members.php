@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - Members Addon
 Plugin URI: http://eventespresso.com/
 Description: Member integration addon for Event Espresso. <a href="admin.php?page=support">Support</a>
-Version: 1.9.8-BETA
+Version: 1.9.8.b
 
 Author: Event Espresso
 Author URI: http://www.eventespresso.com
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 function espresso_members_version() {
-	return '1.9.8-BETA';
+	return '1.9.8.b';
 }
 
 //Update notifications
@@ -40,13 +40,18 @@ function ee_members_load_pue_update() {
 		require(EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php' );
 		$api_key = $org_options['site_license_key'];
 		$host_server_url = 'http://eventespresso.com';
-		$plugin_slug = 'espresso-members-pr';
+		$plugin_slug = array(
+			'premium' => array('p' => 'espresso-members'),
+			'prerelease' => array('b' => 'espresso-members-pr')
+			);
 		$options = array(
 			'apikey' => $api_key,
 			'lang_domain' => 'event_espresso',
 			'checkPeriod' => '24',
 			'option_key' => 'site_license_key',
-			'options_page_slug' => 'event_espresso'
+			'options_page_slug' => 'event_espresso',
+			'plugin_basename' => plugin_basename(dirname(__FILE__)),
+			'use_wp_update' => FALSE, //if TRUE then you want FREE versions of the plugin to be updated from WP
 		);
 		$check_for_updates = new PluginUpdateEngineChecker($host_server_url, $plugin_slug, $options); //initiate the class and start the plugin update engine!
 	}
