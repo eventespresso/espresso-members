@@ -29,6 +29,14 @@ function espresso_members_version() {
 	return '1.9.8.b';
 }
 
+global $wpdb;
+define("EVENTS_MEMBER_REL_TABLE",  $wpdb->prefix . "events_member_rel"); //Define Groupon db table shortname
+define("EVNT_MBR_PLUGINPATH", "/" . plugin_basename( dirname(__FILE__) ) . "/");
+define("EVENT_ESPRESSO_MEMBERS_DIR", WP_PLUGIN_DIR . EVNT_MBR_PLUGINPATH  );
+define("EVNT_MBR_PLUGINFULLURL", WP_PLUGIN_URL . EVNT_MBR_PLUGINPATH );
+
+
+
 //Update notifications
 add_action('action_hook_espresso_members_update_api', 'ee_members_load_pue_update');
 function ee_members_load_pue_update() {
@@ -57,6 +65,8 @@ function ee_members_load_pue_update() {
 	}
 }
 
+ 
+
 //Load the member files
 function espresso_load_member_files() {
 	require_once("member_functions.php");
@@ -65,31 +75,33 @@ function espresso_load_member_files() {
 }
 add_action( 'plugins_loaded', 'espresso_load_member_files', 1 );
 
+
+
 function event_espresso_members_install(){
-//Members Addon database install
-$table_name = "events_member_rel";
-$table_version = "1.9";
-$sql = "id int(11) NOT NULL AUTO_INCREMENT,
+	//Members Addon database install
+	$table_name = "events_member_rel";
+	$table_version = "1.9";
+	$sql = "id int(11) NOT NULL AUTO_INCREMENT,
 	event_id INT(11) DEFAULT NULL,
 	user_id INT(11) DEFAULT NULL,
 	user_role VARCHAR(50) DEFAULT NULL,
 	attendee_id INT(11) DEFAULT NULL,
-	PRIMARY KEY (id)";
-event_espresso_run_install($table_name, $table_version, $sql);
-add_option('events_members_active', 'true', '', 'yes');
-update_option('events_members_active', 'true');
-add_option('events_member_settings', '', '', 'yes');
-//Members Addon database install end
+	PRIMARY KEY  (id)";
+	if ( ! function_exists( 'event_espresso_run_install' )) {
+		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
+	}
+	event_espresso_run_install($table_name, $table_version, $sql);
+	add_option('events_members_active', 'true', '', 'yes');
+	update_option('events_members_active', 'true');
+	add_option('events_member_settings', '', '', 'yes');
+	//Members Addon database install end
 }
+register_activation_hook(__FILE__,'event_espresso_members_install');//Install members tables
+
+
+
 function event_espresso_members_deactivate(){
 	update_option( 'events_members_active', 'false');
 }
-register_activation_hook(__FILE__,'event_espresso_members_install');//Install members tables
 register_deactivation_hook(__FILE__,'event_espresso_members_deactivate');
-
-global $wpdb;
-define("EVENTS_MEMBER_REL_TABLE",  $wpdb->prefix . "events_member_rel"); //Define Groupon db table shortname
-define("EVNT_MBR_PLUGINPATH", "/" . plugin_basename( dirname(__FILE__) ) . "/");
-define("EVENT_ESPRESSO_MEMBERS_DIR", WP_PLUGIN_DIR . EVNT_MBR_PLUGINPATH  );
-define("EVNT_MBR_PLUGINFULLURL", WP_PLUGIN_URL . EVNT_MBR_PLUGINPATH );
 
