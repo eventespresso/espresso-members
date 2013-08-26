@@ -91,9 +91,17 @@ function event_espresso_members_install(){
 		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
 	}
 	event_espresso_run_install($table_name, $table_version, $sql);
-	add_option('events_members_active', 'true', '', 'yes');
 	update_option('events_members_active', 'true');
-	add_option('events_member_settings', '', '', 'yes');
+	$member_options = get_option('events_member_settings');
+	if (empty($member_options)) {
+		$member_options = array(
+				'login_page'=>'',
+				'register_page'=>'',
+				'member_only_all'=>'',
+				'autofilled_editable'=>'');
+		$member_options = apply_filters('filter_hook_espresso_save_member_settings', $member_options);
+		update_option('events_member_settings', $member_options);
+	}
 	//Members Addon database install end
 }
 register_activation_hook(__FILE__,'event_espresso_members_install');//Install members tables
