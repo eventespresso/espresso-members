@@ -206,3 +206,11 @@ div.warning {
 	background-color: #D9EDF7;
 	border: 1px solid #3A87AD;
 }
+
+/* reset the font-size for the table data (looking at you, twentythirteen) */
+
+.my_events_table td,
+.my_events_table td.post-title {
+	font-size: 1em;
+	line-height: 1.33em;
+}
