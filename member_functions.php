@@ -144,7 +144,7 @@ function event_espresso_user_login() {
 	}
 	echo '<h3>' . __('You are not logged in.', 'event_espresso') . '</h3>';
 	echo '<p>' . __('Before you can reserve a spot, you must register.', 'event_espresso') . '</p>';
-	echo '<p>If you are a returning user please <a href="' . $login_page . '?redirect_to=' . urlencode(event_espresso_cur_pageURL()) . '">' . __('Login', 'event_espresso') . '</a></p>';
+	echo '<p>' . __('If you are a returning user please ', 'event_espresso') . '<a href="' . $login_page . '?redirect_to=' . urlencode(event_espresso_cur_pageURL()) . '">' . __('log in', 'event_espresso') . '</a></p>';
 	if (get_option('users_can_register')) {
 		echo '<p>' . __('New users please', 'event_espresso') . ' <a href="' . $register_page . '">' . __('Register', 'event_espresso') . '</a></p>';
 	} else {
