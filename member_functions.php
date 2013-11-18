@@ -86,13 +86,13 @@ function event_espresso_extra_profile_fields($user_id) {
 	if (!current_user_can('edit_user', $user_id)) {
 		return false;
 	}
-	update_user_meta($user_id, 'event_espresso_address', $_POST['event_espresso_address']);
-	update_user_meta($user_id, 'event_espresso_address2', $_POST['event_espresso_address2']);
-	update_user_meta($user_id, 'event_espresso_city', $_POST['event_espresso_city']);
-	update_user_meta($user_id, 'event_espresso_state', $_POST['event_espresso_state']);
-	update_user_meta($user_id, 'event_espresso_zip', $_POST['event_espresso_zip']);
-	update_user_meta($user_id, 'event_espresso_country', $_POST['event_espresso_country']);
-	update_user_meta($user_id, 'event_espresso_phone', $_POST['event_espresso_phone']);
+	update_user_meta($user_id, 'event_espresso_address', sanitize_text_field( $_POST['event_espresso_address'] ));
+	update_user_meta($user_id, 'event_espresso_address2', sanitize_text_field( $_POST['event_espresso_address2'] ));
+	update_user_meta($user_id, 'event_espresso_city', sanitize_text_field( $_POST['event_espresso_city'] ));
+	update_user_meta($user_id, 'event_espresso_state', sanitize_text_field( $_POST['event_espresso_state'] ));
+	update_user_meta($user_id, 'event_espresso_zip', sanitize_text_field( $_POST['event_espresso_zip'] ));
+	update_user_meta($user_id, 'event_espresso_country', sanitize_text_field( $_POST['event_espresso_country'] ));
+	update_user_meta($user_id, 'event_espresso_phone', sanitize_text_field( $_POST['event_espresso_phone'] ));
 }
 
 //}
