@@ -80,7 +80,7 @@ add_action( 'plugins_loaded', 'espresso_load_member_files', 1 );
 function event_espresso_members_install(){
 	//Members Addon database install
 	$table_name = "events_member_rel";
-	$table_version = "1.9";
+	$table_version = "1.9.8";
 	$sql = "id int(11) NOT NULL AUTO_INCREMENT,
 	event_id INT(11) DEFAULT NULL,
 	user_id INT(11) DEFAULT NULL,
