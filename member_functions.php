@@ -270,7 +270,7 @@ if (!function_exists('event_espresso_member_pricing_update')) {
 			<?php
 			$member_prices = $wpdb->get_results("SELECT member_price, member_price_type FROM " . EVENTS_PRICES_TABLE . " WHERE event_id = '" . $event_id . "' ORDER BY id");
 			foreach ($member_prices as $member_price) {
-				echo '<li><label for="add-member-name-"' . $member_price_counter++ . '">' . __('Name', 'event_espresso') . ' ' . $member_price_counter++ . ':</label><input id="add-member-name-' . $member_price_counter++ . '" size="10"  type="text" name="member_price_type[]" value="' . $member_price->member_price_type . '"> ';
+				echo '<li><label for="add-member-name-"' . $member_price_counter++ . '">' . __('Name', 'event_espresso') . ' ' . $member_price_counter++ . ':</label><input id="add-member-name-' . $member_price_counter++ . '" size="10"  type="text" maxlength="99" name="member_price_type[]" value="' . $member_price->member_price_type . '"> ';
 				echo '<label for="add-member-price-' . $member_price_counter++ . '">' . __('Price', 'event_espresso') . ': ' . $org_options['currency_symbol'] . '</label><input id="add-member-price-' . $member_price_counter++ . '" size="5"  type="text" name="member_price[]" value="' . $member_price->member_price . '">';
 				echo '<img class="remove-item" title="' . __('Remove this Attendee', 'event_espresso') . '" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" src="' . EVENT_ESPRESSO_PLUGINFULLURL . 'images/icons/remove.gif" alt="' . __('Remove Attendee', 'event_espresso') . '" />';
 
@@ -290,7 +290,7 @@ if (!function_exists('event_espresso_member_pricing_update')) {
 			var member_price_counter = '<?php echo $member_price_counter++ ?>';
 			function addMemberPriceInput(divName){
 				var newdiv = document.createElement('li');
-				newdiv.innerHTML = "<label for='add-member-name-" + (member_price_counter) + "'><?php _e('Name', 'event_espresso'); ?> " + (member_price_counter) + ": </label><input id='add-member-name-" + (member_price_counter) + "' type='text' size='10' name='member_price_type[]'><label for='add-member-price-" + (member_price_counter) + "'> <?php _e('Price', 'event_espresso'); ?>: <?php echo $org_options['currency_symbol'] ?></label><input id='add-member-price-" + (member_price_counter) + "' type='text' size='5' name='member_price[]'> <?php echo "<img  class='remove-item' onclick='this.parentNode.parentNode.removeChild(this.parentNode);' title='" . __('Remove this Attendee', 'event_espresso') . "' src='" . EVENT_ESPRESSO_PLUGINFULLURL . "images/icons/remove.gif' alt='" . __('Remove Attendee', 'event_espresso') . "' />" ?>";
+				newdiv.innerHTML = "<label for='add-member-name-" + (member_price_counter) + "'><?php _e('Name', 'event_espresso'); ?> " + (member_price_counter) + ": </label><input id='add-member-name-" + (member_price_counter) + "' type='text' size='10' maxlength='99' name='member_price_type[]'><label for='add-member-price-" + (member_price_counter) + "'> <?php _e('Price', 'event_espresso'); ?>: <?php echo $org_options['currency_symbol'] ?></label><input id='add-member-price-" + (member_price_counter) + "' type='text' size='5' name='member_price[]'> <?php echo "<img  class='remove-item' onclick='this.parentNode.parentNode.removeChild(this.parentNode);' title='" . __('Remove this Attendee', 'event_espresso') . "' src='" . EVENT_ESPRESSO_PLUGINFULLURL . "images/icons/remove.gif' alt='" . __('Remove Attendee', 'event_espresso') . "' />" ?>";
 				document.getElementById(divName).appendChild(newdiv);
 				member_price_counter++;
 			}
@@ -312,7 +312,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 		<ul id="dynamicMemberPriceInput">
 			<li>
 				<label for="add-member-name-<?php echo $member_price_counter ?>"><?php _e('Name ', 'event_espresso'); ?><?php echo $member_price_counter++ ?>:</label>
-				<input size="10" id="add-member-name-<?php echo $member_price_counter ?>" type="text"  name="member_price_type[]">
+				<input size="10" id="add-member-name-<?php echo $member_price_counter ?>" type="text" maxlength="99" name="member_price_type[]">
 				<label for="add-member-price-<?php echo $member_price_counter ?>"><?php _e('Price:', 'event_espresso'); ?></label>
 				<input size="5" id="add-member-price-<?php echo $member_price_counter ?>" type="text"  name="member_price[]">
 				<img class="remove-item" title="<?php echo __('Remove this Attendee', 'event_espresso') ?>" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/icons/remove.gif" alt="<?php echo __('Remove Attendee', 'event_espresso') ?>" />
@@ -328,7 +328,7 @@ if (!function_exists('event_espresso_member_pricing_new')) {
 			var member_price_counter = <?php echo $member_price_counter++ ?>;
 			function addMemberPriceInput(divName){
 				var newdiv = document.createElement('li');
-				newdiv.innerHTML = "<label for='add-member-name" + (member_price_counter) + "'><?php _e('Name', 'event_espresso'); ?> " + (member_price_counter) + ": </label><input id='add-member-name-" + (member_price_counter) + "' type='text' size='10' name='member_price_type[]'><label for='add-member-price-" + (member_price_counter) + "'> <?php _e('Price:', 'event_espresso'); ?></label><input id='add-member-price-" + (member_price_counter) + "' type='text' size='5' name='member_price[]'> <?php echo "<img class='remove-item' onclick='this.parentNode.parentNode.removeChild(this.parentNode);' title='" . __('Remove this Attendee', 'event_espresso') . "'  src='" . EVENT_ESPRESSO_PLUGINFULLURL . "images/icons/remove.gif' alt='" . __('Remove Attendee', 'event_espresso') . "' />" ?>";
+				newdiv.innerHTML = "<label for='add-member-name" + (member_price_counter) + "'><?php _e('Name', 'event_espresso'); ?> " + (member_price_counter) + ": </label><input id='add-member-name-" + (member_price_counter) + "' type='text' size='10' maxlength='99' name='member_price_type[]'><label for='add-member-price-" + (member_price_counter) + "'> <?php _e('Price:', 'event_espresso'); ?></label><input id='add-member-price-" + (member_price_counter) + "' type='text' size='5' name='member_price[]'> <?php echo "<img class='remove-item' onclick='this.parentNode.parentNode.removeChild(this.parentNode);' title='" . __('Remove this Attendee', 'event_espresso') . "'  src='" . EVENT_ESPRESSO_PLUGINFULLURL . "images/icons/remove.gif' alt='" . __('Remove Attendee', 'event_espresso') . "' />" ?>";
 				document.getElementById(divName).appendChild(newdiv);
 				member_price_counter++;
 			}
