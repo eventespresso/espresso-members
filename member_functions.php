@@ -107,8 +107,8 @@ function event_espresso_get_current_user_role() {
 	global $espresso_premium;
 	if ($espresso_premium != true)
 		return;
-	global $current_user;
-	get_currentuserinfo();
+	
+	$current_user = wp_get_current_user();
 	$user_roles = $current_user->roles;
 	$user_role = array_shift($user_roles);
 	return $user_role;
@@ -614,8 +614,8 @@ add_filter( 'filter_hook_espresso_group_price_dropdown_sql', 'event_espresso_fil
  */
 function event_espresso_member_edit_profile() {
 	/* Get user info. */
-	global $current_user, $wp_roles, $org_options;
-	get_currentuserinfo();
+	global $wp_roles, $org_options;
+	$current_user = wp_get_current_user();
 
 	// themeroller stuff
 	if (!empty($org_options['style_settings']['enable_default_style']) && $org_options['style_settings']['enable_default_style'] == 'Y') {
